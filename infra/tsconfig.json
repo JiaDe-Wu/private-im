@@ -26,10 +26,7 @@
     ],
     "noEmit": true,
     "isolatedModules": true,
-    "types": [
-      "jest",
-      "node"
-    ]
+    "types": ["node"]
   },
   "exclude": [
     "node_modules",

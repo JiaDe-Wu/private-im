@@ -21,7 +21,7 @@ Private IM tool 是一款私密即时通讯产品，有 Web 端和 Android 端�
 - **朋友圈**：图文动态（最多 9 张）、点赞、评论与回复、互动消息、新动态实时红点、仅自己可见
 - **联系人**：好友申请、黑名单、群组、扫码加好友
 - **多端**：Web 与 Android 实时同步
-- **安全**：文件存放在私有 S3，只能通过短期签名 URL 访问；客户端全程 HTTPS，并严格校验证书
+- **安全**：文件存放在私有 S3（阻止公有访问、默认加密），由服务端签发短期签名链接；客户端全程 HTTPS，并严格校验证书
 
 ## 代码结构
 
@@ -63,6 +63,9 @@ python3 -I seed/seed_aidlc.py && python3 -I seed/seed_moments.py
 | [部署](docs/deployment.md) | AWS 资源、CDK 栈、发布 Web 与 Android 安装包、回滚 |
 | [测试](docs/testing.md) | 接口测试、Web 端到端测试、Android 真机测试 |
 | [朋友圈接口](docs/moments-api.md) | 接口、数据结构、可见性规则、实时提醒 |
+| [Demo 指南](docs/demo-guide.md) | 演示路线、产品特点、技术难点、最值得展示的动效与细节 |
+| [交接说明](docs/handover.md) | 留给后续修复的安全、合规、上架事项及现状 |
+| [工时与工具](docs/effort-and-tools.md) | 工时统计口径、使用的 AI 工具与服务、主要产出 |
 
 ## 许可与第三方组件
 
