@@ -143,7 +143,7 @@
     justify-content: center;
     gap: clamp(48px, 7vw, 120px);
     padding: 48px 40px;
-    transition: opacity 500ms ease 450ms, filter 500ms ease 450ms;
+    transition: opacity 300ms ease 180ms, filter 300ms ease 180ms;
 }
 
 .wk-login-success .wk-login-main {
@@ -275,7 +275,7 @@
 .wk-login-card.shake-1 { animation: wk-login-shake-1 520ms ease both; }
 
 .wk-login-card.success {
-    animation: wk-login-card-out 900ms var(--spring) both;
+    animation: wk-login-card-out 520ms var(--spring) both;
 }
 
 /* Tabs */
@@ -812,7 +812,7 @@
     height: 8px;
     border-radius: 2px;
     background: var(--c);
-    animation: wk-login-confetti 900ms cubic-bezier(.15, .7, .3, 1) both;
+    animation: wk-login-confetti 620ms cubic-bezier(.15, .7, .3, 1) both;
 }
 
 .wk-login-confetti i:nth-child(even) {

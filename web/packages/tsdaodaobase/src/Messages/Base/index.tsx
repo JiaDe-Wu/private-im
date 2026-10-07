@@ -25,6 +25,7 @@ interface MessageBaseProps extends HTMLProps<any>{
 }
 
 export default class MessageBase extends Component<MessageBaseProps, any> {
+    private fresh?: boolean
     channelInfoListener!: ChannelInfoListener
     conversationProvider: IConversationProvider
 
@@ -190,9 +191,13 @@ export default class MessageBase extends Component<MessageBaseProps, any> {
             WKSDK.shared().channelManager.fetchChannelInfo(new Channel(message.fromUID, ChannelTypePerson))
         }
         const messageStyle = this.getMessageStyle(hasContinue, message)
+        // 首次渲染时判断是否为刚发出 / 刚收到的消息（4 秒内），只给这类消息播放入场动效，打开会话时的历史消息不动
+        if (this.fresh === undefined) {
+            this.fresh = !message.timestamp || Date.now() / 1000 - message.timestamp < 4
+        }
 
         return (
-            <div className={classNames("wk-message-base", context.editOn() ? "wk-message-base-check-open" : undefined)} onClick={context.editOn() ? (event) => {
+            <div className={classNames("wk-message-base", context.editOn() ? "wk-message-base-check-open" : undefined, this.fresh && (message.send ? "ps-msg-in-send" : "ps-msg-in-recv"))} onClick={context.editOn() ? (event) => {
                 context.checkeMessage(message.message, !message.checked)
             } : undefined}>
                 <div className="wk-message-base-checkBox" style={{ "marginBottom": messageStyle.marginBottom }}>

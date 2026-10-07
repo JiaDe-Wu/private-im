@@ -39,11 +39,25 @@ scripts/migrate-redis.sh <ElastiCache 地址:6379> # 可选：把本地 Redis �
 | 内容 | 命令 |
 |---|---|
 | Web | `infra/scripts/deploy-web.sh`：构建，带哈希的静态资源设长缓存、其他文件设 `no-cache`，最后刷新 CloudFront 缓存。加 `--skip-build` 只上传 |
-| Android 安装包 | `infra/scripts/publish-apk.sh`：上传到 `/download/pitchshow-dev.apk` |
+| Android 安装包 | `infra/scripts/publish-apk.sh`：上传到 `/download/private-im-dev.apk` |
 | 业务服务 | 在 EC2 上重启 `devenv/run-server.sh`（见 [开发指南](development.md)） |
 | 基础设施 | `cd infra && npx cdk diff && npx cdk deploy <栈名> --outputs-file cdk-outputs.json` |
 
-## 4. 回滚
+## 4. 演示当天：关闭访问密码
+
+开发环境默认整站有访问密码，浏览器会先弹出认证框。演示时如果希望观众扫码后直接看到 App 自己的登录页，可以临时关闭：
+
+```bash
+cd infra
+npx cdk deploy PitchShowDevWeb -c publicAccess=true --outputs-file cdk-outputs.json   # 关闭（输出 AccessMode = public）
+npx cdk deploy PitchShowDevWeb --outputs-file cdk-outputs.json                         # 演示结束后恢复（AccessMode = password）
+```
+
+- 生效时间：CloudFront 一般在 1～3 分钟内全球生效。
+- 关闭期间网页、接口、安装包下载都可以被任何人访问；演示账号和开发环境的固定验证码也同样暴露，**演示结束后务必恢复**。
+- Android 安装包内置了访问密码，关闭期间同样可以正常使用（多出的 `Authorization` 头会被忽略），不需要重新打包。
+
+## 5. 回滚
 
 | 变更 | 回滚方式 |
 |---|---|
@@ -52,7 +66,7 @@ scripts/migrate-redis.sh <ElastiCache 地址:6379> # 可选：把本地 Redis �
 | Web | 重新发布上一个版本的构建产物 |
 | 删除 `PitchShowDevWeb` | 先执行 `scripts/attach-origin-sg.sh --detach`；网页 S3 桶设为保留，需要手动删除 |
 
-## 5. 注意事项
+## 6. 注意事项
 
 - **不要给 CloudFront 分发配置 `errorResponses`**。它对整个分发生效，会把 `/api` 的 404 替换成 `index.html`（状态码 200），导致前端解析出错。Web 端不使用路径路由，不需要这项回退。
 - CloudFront 前缀列表在安全组里按 55 条规则计算，单个安全组最多 60 条。所以回源端口放在单独的安全组里，并且用一条规则覆盖连续的端口范围。

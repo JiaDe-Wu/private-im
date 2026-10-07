@@ -1,5 +1,6 @@
 export { default as BaseModule } from "./module" 
 export { default as WKApp } from "./App"
+export { PsLightbox } from "./Components/PsLightbox"
 export * from "./App"
 export * from './Service/Const'
 export * from './Service/Module'

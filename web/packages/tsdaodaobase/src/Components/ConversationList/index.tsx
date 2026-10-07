@@ -154,7 +154,7 @@ export default class ConversationList extends Component<ConversationListProps, C
         const { select, onClick } = this.props
         const typing = TypingManager.shared.getTyping(conversationWrap.channel)
         const selected = select && select.isEqual(conversationWrap.channel)
-        return <div key={conversationWrap.channel.getChannelKey()} onClick={() => {
+        return <div key={conversationWrap.channel.getChannelKey()} data-ck={conversationWrap.channel.getChannelKey()} onClick={() => {
             if (onClick) {
                 onClick(conversationWrap)
             }
@@ -213,13 +213,49 @@ export default class ConversationList extends Component<ConversationListProps, C
                         </div>
                         <div className="wk-conversationlist-item-reddot">
                             {
-                                conversationWrap.unread > 0 ? <Badge style={channelInfo?.mute ? { "border": "none", "backgroundColor": "rgb(200,200,200)" } : { border: "none" }} count={conversationWrap.unread} type='danger'></Badge> : undefined
+                                conversationWrap.unread > 0 ? <span key={conversationWrap.unread} className="ps-badge-pop"><Badge style={channelInfo?.mute ? { "border": "none", "backgroundColor": "rgb(200,200,200)" } : { border: "none" }} count={conversationWrap.unread} type='danger'></Badge></span> : undefined
                             }
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    }
+
+    // ---- FLIP 重排动画：会话因新消息移动位置时平滑过渡，而不是瞬间跳动 ----
+    getSnapshotBeforeUpdate(): Map<string, number> | null {
+        const root = document.getElementById("wk-conversationlist")
+        if (!root) return null
+        const tops = new Map<string, number>()
+        root.querySelectorAll<HTMLElement>(".wk-conversationlist-item[data-ck]").forEach((el) => tops.set(el.dataset.ck!, el.offsetTop))
+        return tops
+    }
+
+    componentDidUpdate(_p: ConversationListProps, _s: ConversationListState, tops: Map<string, number> | null) {
+        const root = document.getElementById("wk-conversationlist")
+        if (!root || !tops || tops.size === 0 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+        const moved: HTMLElement[] = []
+        root.querySelectorAll<HTMLElement>(".wk-conversationlist-item[data-ck]").forEach((el) => {
+            const old = tops.get(el.dataset.ck!)
+            if (old === undefined) {
+                el.classList.remove("ps-conv-new")
+                void el.offsetWidth
+                el.classList.add("ps-conv-new") // 新出现的会话：从上方淡入
+                return
+            }
+            const delta = old - el.offsetTop
+            if (Math.abs(delta) < 2) return
+            el.style.transition = "none"
+            el.style.translate = `0 ${delta}px`
+            moved.push(el)
+        })
+        if (moved.length === 0) return
+        void root.offsetHeight
+        requestAnimationFrame(() => moved.forEach((el) => {
+            el.style.transition = "translate 380ms cubic-bezier(.2, .8, .2, 1)"
+            el.style.translate = "0 0"
+            el.addEventListener("transitionend", () => { el.style.transition = ""; el.style.translate = "" }, { once: true })
+        }))
     }
 
     onTop(channelInfo: ChannelInfo) {

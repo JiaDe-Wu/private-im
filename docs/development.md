@@ -87,7 +87,7 @@ sdk.dir=$HOME/.local/android-sdk
 applicationId=ai.pitchshow.im
 EOF
 ANDROID_HOME=~/.local/android-sdk ./gradlew assembleDebug
-~/tsdd/infra/scripts/publish-apk.sh      # 发布到 /download/pitchshow-dev.apk
+~/tsdd/infra/scripts/publish-apk.sh      # 发布到 /download/private-im-dev.apk
 ```
 
 - 默认接口地址和开发环境访问密码在 `app/build.gradle` 的 `buildConfigField` 里配置。

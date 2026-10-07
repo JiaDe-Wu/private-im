@@ -143,6 +143,7 @@ public abstract class WKBaseFragment<WKVBinding extends ViewBinding> extends Fra
         }
         View titleBar = mContentView.findViewById(R.id.titleBarLayout);
         if (titleBar == null) return;
+        com.chat.base.utils.systembar.WKStatusBarUtils.fitStatusBarSpacer(mContentView.findViewById(R.id.statusBarView));
         //设置标题
         TextView titleCenterTv = mContentView.findViewById(R.id.titleCenterTv);
         setTitle(titleCenterTv);

@@ -1,16 +1,18 @@
 {
-  "name": "tools",
+  "name": "private-im-tools",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Private IM tool 测试与素材工具：Web 端到端测试、页面巡检、品牌素材生成依赖（sharp）",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "e2e": "node e2e-cloud.js /tmp/e2e-out",
+    "audit": "node web-audit.js /tmp/web-audit",
+    "devicefarm": "devicefarm/run.sh"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "UNLICENSED",
   "dependencies": {
     "playwright": "^1.63.0",
     "sharp": "^0.35.5"
-  }
+  },
+  "private": true
 }

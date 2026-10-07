@@ -8,7 +8,8 @@ import  { LoginModule } from '@tsdaodao/login';
 import  { DataSourceModule } from '@tsdaodao/datasource';
 import {ContactsModule} from '@tsdaodao/contacts';
 import { MomentsModule } from '@tsdaodao/moments';
-import '@tsdaodao/base/src/theme/pitchshow-chat.css'; // PitchShow 聊天主题，须在各模块之后引入
+import '@tsdaodao/base/src/theme/pitchshow-chat.css'; // 聊天主题，须在各模块之后引入
+import '@tsdaodao/base/src/theme/pitchshow-motion.css'; // 全局动效，须在主题之后引入
 
 const apiURL = "https://api.botgate.cn/v1/"
 

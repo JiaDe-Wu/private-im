@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
-import Viewer from "react-viewer";
 import { Toast, Modal } from "@douyinfe/semi-ui";
-import { WKApp } from "@tsdaodao/base";
+import { WKApp, PsLightbox } from "@tsdaodao/base";
 import { Moment, MomentComment, MomentsAPI, PrivacyPrivate, imageURL } from "../service";
 import { formatMomentTime, gridColumns, singleImageSize } from "../utils";
 
@@ -40,7 +39,7 @@ export default function MomentItem(props: MomentItemProps) {
     const [sending, setSending] = useState(false)
     const [expanded, setExpanded] = useState(false)
     const [collapsible, setCollapsible] = useState(false)
-    const [viewerIndex, setViewerIndex] = useState(-1)
+    const gridRef = useRef<HTMLDivElement>(null)
     const [likeBurst, setLikeBurst] = useState(0)
     const textRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
@@ -148,7 +147,6 @@ export default function MomentItem(props: MomentItemProps) {
 
     const cols = gridColumns(m.imgs.length)
     const single = m.imgs.length === 1 ? singleImageSize(m.imgs[0].width, m.imgs[0].height) : undefined
-    const images = m.imgs.map((img) => ({ src: imageURL(img.url), alt: "", downloadUrl: imageURL(img.url) }))
     const hasSocial = m.likes.length > 0 || m.comments.length > 0
 
     return <article className="wk-moment">
@@ -159,11 +157,15 @@ export default function MomentItem(props: MomentItemProps) {
                 <div ref={textRef} className={classNames("wk-moment-text", collapsible && !expanded && "collapsed")}>{m.content}</div>
                 {collapsible ? <button className="wk-moment-more" onClick={() => setExpanded(!expanded)}>{expanded ? "收起" : "全文"}</button> : undefined}
             </> : undefined}
-            {m.imgs.length > 0 ? <div className={classNames("wk-moment-grid", `cols-${cols}`)}>
+            {m.imgs.length > 0 ? <div className={classNames("wk-moment-grid", `cols-${cols}`)} ref={gridRef}>
                 {m.imgs.map((img, i) => (
                     <div key={i} className="wk-moment-cell" style={single ? { width: single.width, height: single.height } : undefined}
-                        onClick={() => setViewerIndex(i)}>
-                        <img src={imageURL(img.url)} alt="" loading="lazy" />
+                        onClick={() => PsLightbox.open({
+                            images: m.imgs.map((x) => ({ src: imageURL(x.url), width: x.width, height: x.height })),
+                            index: i,
+                            getSource: (k) => gridRef.current?.children[k] as HTMLElement,
+                        })}>
+                        <img src={imageURL(img.url)} alt="" loading="lazy" className="ps-img-fade" onLoad={(e) => e.currentTarget.classList.add("ps-img-loaded")} />
                     </div>
                 ))}
             </div> : undefined}
@@ -186,13 +188,15 @@ export default function MomentItem(props: MomentItemProps) {
 
             {hasSocial || replyTo !== undefined ? <div className="wk-moment-social">
                 {m.likes.length > 0 ? <div className="wk-moment-likes">
-                    <span key={likeBurst} className={classNames("wk-moment-likes-icon", likeBurst > 0 && "burst")}><HeartIcon filled /></span>
+                    <span key={likeBurst} className={classNames("wk-moment-likes-icon", likeBurst > 0 && "burst")}><HeartIcon filled />
+                        {likeBurst > 0 ? <span className="ps-heart-particles" aria-hidden="true"><i /><i /><i /><i /><i /></span> : undefined}
+                    </span>
                     {m.likes.map((l, i) => <React.Fragment key={l.uid}>
                         {i > 0 ? "，" : ""}<span className="wk-moment-user" onClick={() => onOpenUser?.(l.uid, l.name)}>{l.name}</span>
                     </React.Fragment>)}
                 </div> : undefined}
                 {m.comments.length > 0 ? <ul className={classNames("wk-moment-comments", m.likes.length > 0 && "divided")}>
-                    {m.comments.map((c) => <li key={c.id} onClick={() => onCommentClick(c)}>
+                    {m.comments.map((c) => <li key={c.id} className={Date.now() / 1000 - c.created_at < 8 ? "ps-comment-new" : undefined} onClick={() => onCommentClick(c)}>
                         <span className="wk-moment-user" onClick={(e) => { e.stopPropagation(); onOpenUser?.(c.uid, c.name) }}>{c.name}</span>
                         {c.reply_uid ? <><span className="wk-moment-reply-word">回复</span><span className="wk-moment-user" onClick={(e) => { e.stopPropagation(); onOpenUser?.(c.reply_uid!, c.reply_name || "") }}>{c.reply_name}</span></> : undefined}
                         ：{c.content}
@@ -211,17 +215,5 @@ export default function MomentItem(props: MomentItemProps) {
             </div> : undefined}
         </div>
 
-        <Viewer
-            visible={viewerIndex >= 0}
-            activeIndex={Math.max(0, viewerIndex)}
-            images={images}
-            noImgDetails={true}
-            downloadable={true}
-            rotatable={false}
-            showTotal={images.length > 1}
-            changeable={images.length > 1}
-            onMaskClick={() => setViewerIndex(-1)}
-            onClose={() => setViewerIndex(-1)}
-        />
     </article>
 }

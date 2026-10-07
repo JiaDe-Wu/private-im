@@ -4,7 +4,7 @@ import WKApp from "../../App"
 import { MessageContentTypeConst } from "../../Service/Const"
 import MessageBase from "../Base"
 import { MessageCell } from "../MessageCell"
-import Viewer from 'react-viewer';
+import { PsLightbox } from "../../Components/PsLightbox";
 
 
 export class ImageContent extends MediaMessageContent {
@@ -91,34 +91,23 @@ export class ImageCell extends MessageCell<any, ImageCellState> {
         const { message } = this.props
         const content = message.content as ImageContent
         let scaleSize = this.imageScale(content.width, content.height);
-        return <img alt="" src={this.getImageSrc(content)} style={{ width: scaleSize.width, height: scaleSize.height }} />
+        // 加载完成后淡入（ps-img-loaded，见 pitchshow-motion.css）
+        return <img alt="" className="ps-img-fade" src={this.getImageSrc(content)} style={{ width: scaleSize.width, height: scaleSize.height }}
+            onLoad={(e) => e.currentTarget.classList.add("ps-img-loaded")} />
     }
 
     render() {
         const { message, context } = this.props
-        const { showPreview } = this.state
         const content = message.content as ImageContent
         let scaleSize = this.imageScale(content.width, content.height);
         const imageURL = this.getImageSrc(content) || ""
         return <MessageBase context={context} message={message}>
-            <div className="wk-message-image" style={{ width: scaleSize.width, height: scaleSize.height, cursor: "pointer" }} onClick={() => {
-                this.setState({
-                    showPreview: !this.state.showPreview,
-                })
+            <div className="wk-message-image" style={{ width: scaleSize.width, height: scaleSize.height, cursor: "zoom-in" }} onClick={(e) => {
+                const el = e.currentTarget
+                PsLightbox.open({ images: [{ src: imageURL, width: content.width, height: content.height }], getSource: () => el })
             }}>
                 {this.getImageElement()}
             </div>
-            <Viewer
-                visible={showPreview}
-                noImgDetails={true}
-                downloadable={true}
-                rotatable={false}
-                changeable={false}
-                showTotal={false}
-                onMaskClick={() => { this.setState({ showPreview: false }); }}
-                onClose={() => { this.setState({ showPreview: false }); }}
-                images={[{ src: imageURL, alt: '', downloadUrl: imageURL }]}
-            />
         </MessageBase>
     }
 }

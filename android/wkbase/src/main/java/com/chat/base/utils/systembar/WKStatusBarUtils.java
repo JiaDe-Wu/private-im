@@ -324,4 +324,37 @@ public class WKStatusBarUtils {
     }
 
 
+
+    /**
+     * 让标题栏上方的状态栏占位条（statusBarView）与系统真实的状态栏高度一致。
+     * 原布局写死 40dp；带挖孔屏的机型（如 Pixel 9 约 66dp）状态栏更高，标题栏右侧按钮会落在系统状态栏的触摸区里点不动。
+     */
+    public static void fitStatusBarSpacer(final android.view.View spacer) {
+        if (spacer == null) return;
+        final Runnable apply = () -> {
+            androidx.core.view.WindowInsetsCompat insets = androidx.core.view.ViewCompat.getRootWindowInsets(spacer);
+            if (insets == null) return;
+            int top = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.statusBars() | androidx.core.view.WindowInsetsCompat.Type.displayCutout()).top;
+            android.view.ViewGroup.LayoutParams lp = spacer.getLayoutParams();
+            if (top > 0 && lp != null && lp.height != top) {
+                lp.height = top;
+                spacer.setLayoutParams(lp);
+            }
+        };
+        if (spacer.isAttachedToWindow()) {
+            spacer.post(apply);
+        } else {
+            spacer.addOnAttachStateChangeListener(new android.view.View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(android.view.View v) {
+                    v.removeOnAttachStateChangeListener(this);
+                    v.post(apply);
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(android.view.View v) {
+                }
+            });
+        }
+    }
 }

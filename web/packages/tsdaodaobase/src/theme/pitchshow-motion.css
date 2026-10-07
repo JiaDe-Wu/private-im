@@ -1,0 +1,281 @@
+/*
+ * Private IM tool 全局动效
+ * 在 pitchshow-chat.css 之后引入（apps/web/src/index.tsx）。
+ * 约定：
+ *   - 只对 opacity / translate / scale / filter 做动画（走合成层，不触发重排），时长 160–420ms
+ *   - 统一缓动：--ps-ease（标准）、--ps-spring（带一点回弹）
+ *   - 尊重系统「减少动态效果」设置（文件末尾统一关闭）
+ *   - 不要给聊天输入框工具栏的按钮加 transform / scale（表情面板相对它们绝对定位）
+ */
+
+:root {
+    --ps-ease: cubic-bezier(.2, .8, .2, 1);
+    --ps-spring: cubic-bezier(.34, 1.56, .64, 1);
+    --ps-dur-fast: 160ms;
+    --ps-dur: 240ms;
+    --ps-dur-slow: 420ms;
+}
+
+/* ---------------- 首页入场（登录后由 AppLayout 给 body 加 ps-app-entering，持续 1.2s） ---------------- */
+
+body.ps-app-entering .wk-layout-tab {
+    animation: ps-enter-left 420ms var(--ps-ease) both;
+}
+
+body.ps-app-entering .wk-layout-content-left {
+    animation: ps-enter-fade 360ms var(--ps-ease) 80ms both;
+}
+
+body.ps-app-entering .wk-layout-content-right {
+    animation: ps-enter-rise 480ms var(--ps-ease) 160ms both;
+}
+
+body.ps-app-entering .wk-conversationlist-item {
+    animation: ps-enter-item 420ms var(--ps-ease) both;
+}
+
+body.ps-app-entering .wk-conversationlist-item:nth-child(1) { animation-delay: 120ms; }
+body.ps-app-entering .wk-conversationlist-item:nth-child(2) { animation-delay: 160ms; }
+body.ps-app-entering .wk-conversationlist-item:nth-child(3) { animation-delay: 200ms; }
+body.ps-app-entering .wk-conversationlist-item:nth-child(4) { animation-delay: 240ms; }
+body.ps-app-entering .wk-conversationlist-item:nth-child(5) { animation-delay: 280ms; }
+body.ps-app-entering .wk-conversationlist-item:nth-child(6) { animation-delay: 320ms; }
+body.ps-app-entering .wk-conversationlist-item:nth-child(n+7) { animation-delay: 360ms; }
+
+@keyframes ps-enter-left {
+    from { opacity: 0; translate: -16px 0; }
+    to { opacity: 1; translate: 0 0; }
+}
+
+@keyframes ps-enter-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes ps-enter-rise {
+    from { opacity: 0; translate: 0 12px; scale: .985; filter: blur(4px); }
+    to { opacity: 1; translate: 0 0; scale: 1; filter: blur(0); }
+}
+
+@keyframes ps-enter-item {
+    from { opacity: 0; translate: -10px 0; }
+    to { opacity: 1; translate: 0 0; }
+}
+
+/*
+ * 注意：容器上的位移动画一律用 fill-mode: backwards（不保留结束值）。
+ * 结束后若残留 translate，会让内部的 fixed 弹层（右键菜单、表情面板）以该容器为定位参照而错位。
+ */
+
+/* ---------------- 会话列表 ---------------- */
+
+body .wk-conversationlist-item-content {
+    transition: background-color 200ms var(--ps-ease), box-shadow 200ms var(--ps-ease);
+}
+
+/* 新出现的会话：从上方淡入（ConversationList.componentDidUpdate 添加） */
+body .wk-conversationlist-item.ps-conv-new {
+    animation: ps-conv-new 360ms var(--ps-ease) backwards;
+}
+
+/* 未读数变化：角标弹一下（key 随未读数变化重新挂载） */
+body .ps-badge-pop {
+    display: inline-flex;
+    animation: ps-pop 380ms var(--ps-spring) backwards;
+}
+
+@keyframes ps-conv-new {
+    from { opacity: 0; translate: 0 -14px; }
+    to { opacity: 1; translate: 0 0; }
+}
+
+@keyframes ps-pop {
+    0% { scale: .3; opacity: 0; }
+    60% { scale: 1.18; opacity: 1; }
+    100% { scale: 1; }
+}
+
+/* ---------------- 聊天页 ---------------- */
+
+/* 切换会话：整页淡入（只用透明度，不产生定位参照） */
+body .wk-conversation {
+    animation: ps-enter-fade 220ms var(--ps-ease) backwards;
+}
+
+body .wk-conversation-messages {
+    animation: ps-chat-rise 320ms var(--ps-ease) backwards;
+}
+
+@keyframes ps-chat-rise {
+    from { opacity: 0; translate: 0 10px; }
+    to { opacity: 1; translate: 0 0; }
+}
+
+/* 新消息入场：收到的从左下、发出的从右下轻轻弹入（MessageBase 对 4 秒内的消息加类名） */
+body .ps-msg-in-recv .wk-message-base-box {
+    transform-origin: left bottom;
+    animation: ps-msg-recv 320ms var(--ps-spring) backwards;
+}
+
+body .ps-msg-in-send .wk-message-base-box {
+    transform-origin: right bottom;
+    animation: ps-msg-send 320ms var(--ps-spring) backwards;
+}
+
+@keyframes ps-msg-recv {
+    from { opacity: 0; translate: -10px 8px; scale: .94; }
+    to { opacity: 1; translate: 0 0; scale: 1; }
+}
+
+@keyframes ps-msg-send {
+    from { opacity: 0; translate: 10px 8px; scale: .94; }
+    to { opacity: 1; translate: 0 0; scale: 1; }
+}
+
+/* 发送按钮按压反馈（不在工具栏里，可以用 scale） */
+body .ps-send {
+    transition: background-color 200ms var(--ps-ease), color 200ms var(--ps-ease), scale 200ms var(--ps-spring), box-shadow 200ms var(--ps-ease);
+}
+
+body .ps-send:active {
+    scale: .92;
+}
+
+/* ---------------- 图片：加载完成后由模糊淡入清晰 ---------------- */
+
+body img.ps-img-fade {
+    opacity: 0;
+    filter: blur(8px);
+    transition: opacity 360ms var(--ps-ease), filter 480ms var(--ps-ease);
+}
+
+body img.ps-img-fade.ps-img-loaded {
+    opacity: 1;
+    filter: none;
+}
+
+/* ---------------- 朋友圈 ---------------- */
+
+/* 动态逐条错落出现 */
+body .wk-moment {
+    animation: ps-moment-in 420ms var(--ps-ease) backwards;
+}
+
+body .wk-moment:nth-child(1) { animation-delay: 40ms; }
+body .wk-moment:nth-child(2) { animation-delay: 90ms; }
+body .wk-moment:nth-child(3) { animation-delay: 140ms; }
+body .wk-moment:nth-child(4) { animation-delay: 190ms; }
+body .wk-moment:nth-child(5) { animation-delay: 240ms; }
+
+@keyframes ps-moment-in {
+    from { opacity: 0; translate: 0 16px; }
+    to { opacity: 1; translate: 0 0; }
+}
+
+/* 九宫格：悬停轻微放大（图片本身，格子裁切不变） */
+body .wk-moment-cell {
+    overflow: hidden;
+}
+
+body .wk-moment-cell img {
+    transition: scale 420ms var(--ps-ease), opacity 360ms var(--ps-ease), filter 480ms var(--ps-ease);
+}
+
+body .wk-moment-cell:hover img {
+    scale: 1.05;
+}
+
+/* 新评论滑入 */
+body .ps-comment-new {
+    animation: ps-comment-in 360ms var(--ps-spring) backwards;
+}
+
+@keyframes ps-comment-in {
+    from { opacity: 0; translate: -8px 0; background: rgba(124, 58, 237, .16); }
+    to { opacity: 1; translate: 0 0; }
+}
+
+/* 点赞：心形周围飞出 5 颗小爱心 */
+body .wk-moment-likes-icon {
+    position: relative;
+}
+
+body .ps-heart-particles {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    pointer-events: none;
+}
+
+body .ps-heart-particles i {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    margin: -3px;
+    border-radius: 50%;
+    background: #f5455c;
+    animation: ps-heart-fly 620ms cubic-bezier(.15, .7, .3, 1) both;
+}
+
+body .ps-heart-particles i:nth-child(1) { --dx: -16px; --dy: -14px; background: #f5455c; }
+body .ps-heart-particles i:nth-child(2) { --dx: 0px; --dy: -20px; background: #a78bfa; animation-delay: 30ms; }
+body .ps-heart-particles i:nth-child(3) { --dx: 16px; --dy: -14px; background: #ff9a80; animation-delay: 60ms; }
+body .ps-heart-particles i:nth-child(4) { --dx: -12px; --dy: 10px; background: #7c3aed; animation-delay: 20ms; }
+body .ps-heart-particles i:nth-child(5) { --dx: 12px; --dy: 10px; background: #f5455c; animation-delay: 50ms; }
+
+@keyframes ps-heart-fly {
+    0% { translate: 0 0; scale: .4; opacity: 1; }
+    100% { translate: var(--dx) var(--dy); scale: 1; opacity: 0; }
+}
+
+/* ---------------- 全局细节 ---------------- */
+
+::selection {
+    background: rgba(124, 58, 237, .22);
+}
+
+body :focus-visible {
+    outline: 2px solid rgba(124, 58, 237, .55);
+    outline-offset: 2px;
+    border-radius: 6px;
+}
+
+/* 细滚动条：平时几乎透明，悬停区域时显现 */
+body * {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+}
+
+body *:hover {
+    scrollbar-color: rgba(124, 58, 237, .28) transparent;
+}
+
+body ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+body ::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+body *:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(124, 58, 237, .28);
+}
+
+body ::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* ---------------- 减少动态效果 ---------------- */
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 1ms !important;
+        animation-delay: 0ms !important;
+        transition-duration: 1ms !important;
+    }
+}

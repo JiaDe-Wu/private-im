@@ -39,17 +39,26 @@ export class DevWebStack extends cdk.Stack {
       }],
     });
 
+    // 访问密码开关：默认开启；演示当天可用 `npx cdk deploy PitchShowDevWeb -c publicAccess=true` 临时关闭
+    const publicAccess = this.node.tryGetContext('publicAccess') === 'true' || this.node.tryGetContext('publicAccess') === true;
+
     const fnCode = (name: string) => cloudfront.FunctionCode.fromInline(
       fs.readFileSync(path.join(__dirname, '..', 'functions', name), 'utf8'));
     const authFn = new cloudfront.Function(this, 'BasicAuthFn', {
       functionName: 'pitchshow-dev-basic-auth',
-      comment: 'PitchShow dev: 访问密码',
+      comment: 'Private IM dev: 访问密码',
       runtime: cloudfront.FunctionRuntime.JS_2_0,
       code: fnCode('basic-auth.js'),
     });
+    const apiPublicFn = new cloudfront.Function(this, 'ApiRewritePublicFn', {
+      functionName: 'pitchshow-dev-api-rewrite-public',
+      comment: 'Private IM dev: 去掉 /api 前缀（公开访问模式）',
+      runtime: cloudfront.FunctionRuntime.JS_2_0,
+      code: fnCode('api-rewrite-public.js'),
+    });
     const apiFn = new cloudfront.Function(this, 'ApiRewriteFn', {
       functionName: 'pitchshow-dev-api-rewrite',
-      comment: 'PitchShow dev: 访问密码 + 去掉 /api 前缀',
+      comment: 'Private IM dev: 访问密码 + 去掉 /api 前缀',
       runtime: cloudfront.FunctionRuntime.JS_2_0,
       code: fnCode('api-rewrite.js'),
     });
@@ -69,7 +78,7 @@ export class DevWebStack extends cdk.Stack {
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
         compress: true,
-        functionAssociations: [{ function: authFn, eventType: cloudfront.FunctionEventType.VIEWER_REQUEST }],
+        functionAssociations: publicAccess ? [] : [{ function: authFn, eventType: cloudfront.FunctionEventType.VIEWER_REQUEST }],
       },
       additionalBehaviors: {
         '/api/*': {
@@ -79,7 +88,7 @@ export class DevWebStack extends cdk.Stack {
           cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
           originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
           compress: true,
-          functionAssociations: [{ function: apiFn, eventType: cloudfront.FunctionEventType.VIEWER_REQUEST }],
+          functionAssociations: [{ function: publicAccess ? apiPublicFn : apiFn, eventType: cloudfront.FunctionEventType.VIEWER_REQUEST }],
         },
       },
       // 不设 errorResponses：它对整个分发生效，会把 /api 的 404 替换成 index.html（200）。Web 端不使用路径路由，无需回退
@@ -98,6 +107,7 @@ export class DevWebStack extends cdk.Stack {
       },
     });
 
+    new cdk.CfnOutput(this, 'AccessMode', { value: publicAccess ? 'public' : 'password', description: '访问密码开关（-c publicAccess=true 关闭）' });
     new cdk.CfnOutput(this, 'WebUrl', { value: `https://${web.distributionDomainName}` });
     new cdk.CfnOutput(this, 'WebDistributionId', { value: web.distributionId });
     new cdk.CfnOutput(this, 'WssAddr', { value: `wss://${ws.distributionDomainName}`, description: '填入 WuKongIM 的 WK_EXTERNAL_WSSADDR' });

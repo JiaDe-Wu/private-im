@@ -1,7 +1,7 @@
 # ---- 运行数据与环境（不入库）----
 devenv/data/
 devenv/*.log
-bin/
+/bin/
 *.log
 
 # ---- 依赖与编译产物 ----

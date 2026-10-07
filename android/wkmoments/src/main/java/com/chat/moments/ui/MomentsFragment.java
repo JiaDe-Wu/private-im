@@ -36,14 +36,8 @@ public class MomentsFragment extends WKBaseFragment<MomentListLayoutBinding> {
     @Override
     protected void getRightView(ImageView rightIv) {
         rightIv.setContentDescription(getString(R.string.moments_publish_title));
-        // 直接绑在图标上：基类挂在 titleRightLayout 上的点击在真机上没有触发
+        // 直接绑在图标上（点击区域更明确）
         rightIv.setOnClickListener(v -> openPublish());
-        android.util.Log.i("PSMoments", "camera bound fragment=" + System.identityHashCode(this));
-        rightIv.setOnTouchListener((v, e) -> {
-            if (e.getActionMasked() == android.view.MotionEvent.ACTION_DOWN)
-                android.util.Log.i("PSMoments", "camera touch down fragment=" + System.identityHashCode(this) + " added=" + isAdded());
-            return false;
-        });
     }
 
     @Override
@@ -52,7 +46,6 @@ public class MomentsFragment extends WKBaseFragment<MomentListLayoutBinding> {
     }
 
     private void openPublish() {
-        android.util.Log.i("PSMoments", "openPublish");
         startActivityForResult(new Intent(getActivity(), MomentPublishActivity.class), REQ_PUBLISH);
     }
 
@@ -67,7 +60,6 @@ public class MomentsFragment extends WKBaseFragment<MomentListLayoutBinding> {
     @Override
     public void onResume() {
         super.onResume();
-        android.util.Log.i("PSMoments", "onResume fragment=" + System.identityHashCode(this) + " viewAttached=" + (wkVBinding.getRoot().isAttachedToWindow()));
         controller.reload(); // ViewPager2 只在当前页 RESUMED，切到本页即刷新
     }
 

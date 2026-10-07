@@ -103,7 +103,7 @@ Private IM tool 是一款私密、轻快的即时通讯产品，支持 Web 和 A
 | 网页与接口 | `https://<网页分发>/`、`/api/v1/` | 访问密码保护（开发环境） |
 | Web 长连接 | `wss://<WebSocket 分发>` | 浏览器跨域不会带上 Basic Auth，所以不设访问密码；连接本身需要 IM 令牌 |
 | App 长连接 | `TCP <EC2 公网 IP>:18100` | App 的 SDK 只支持 TCP，CloudFront 无法代理 TCP，只能直连 |
-| App 安装包 | `https://<网页分发>/download/pitchshow-dev.apk` | 调试包 |
+| App 安装包 | `https://<网页分发>/download/private-im-dev.apk` | 调试包 |
 
 基础设施代码（AWS CDK）见 [部署文档](../deployment.md)。
 

@@ -337,22 +337,20 @@ export class LoginVM extends ProviderListener {
         }
     }
 
-    // 先播放成功动效，再写入登录信息并跳转
+    // 立即写入登录信息并开始初始化（建连、同步）；离场动效与初始化并行，由外层布局在动效结束后切到首页
     loginSuccess(data:any) {
         this.success = true
         this.notifyListener()
-        window.setTimeout(() => {
-            const loginInfo = WKApp.loginInfo
-            loginInfo.appID = data.app_id
-            loginInfo.uid = data.uid
-            loginInfo.shortNo = data.short_no
-            loginInfo.token = data.token
-            loginInfo.name = data.name
-            loginInfo.sex = data.sex
-            loginInfo.save()
+        const loginInfo = WKApp.loginInfo
+        loginInfo.appID = data.app_id
+        loginInfo.uid = data.uid
+        loginInfo.shortNo = data.short_no
+        loginInfo.token = data.token
+        loginInfo.name = data.name
+        loginInfo.sex = data.sex
+        loginInfo.save()
 
-            WKApp.endpoints.callOnLogin()
-        }, 900)
+        WKApp.endpoints.callOnLogin()
     }
 
     requestUUID() {

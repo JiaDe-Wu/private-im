@@ -343,6 +343,7 @@ public abstract class WKBaseActivity<WKVBinding extends ViewBinding> extends Swi
         }
         boolean hideStatusBar = hideStatusBar();
         statusBarView.setVisibility(hideStatusBar ? View.GONE : View.VISIBLE);
+        com.chat.base.utils.systembar.WKStatusBarUtils.fitStatusBarSpacer(statusBarView);
         ImageView backIv = findViewById(R.id.backIv);
         backIv.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.titleBarIcon), PorterDuff.Mode.MULTIPLY));
 

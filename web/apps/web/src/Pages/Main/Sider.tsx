@@ -113,6 +113,11 @@ export function Sider(props: { vm: MainVM }) {
     }
 
     const selectMenu = (menus: Menus) => {
+        const prev = vm.currentMenus
+        // 带 onPress 的菜单（如朋友圈）会整块替换右侧内容；切到别的菜单时还原为空状态，避免残留
+        if (prev && prev.id !== menus.id && prev.onPress) {
+            WKApp.routeRight.replaceToRoot(<ChatEmpty />)
+        }
         vm.currentMenus = menus
         if (menus.onPress) {
             menus.onPress()

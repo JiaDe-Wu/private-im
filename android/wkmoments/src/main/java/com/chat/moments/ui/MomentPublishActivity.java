@@ -47,7 +47,6 @@ public class MomentPublishActivity extends WKBaseActivity<ActMomentPublishBindin
 
     @Override
     protected void initView() {
-        android.util.Log.i("PSMoments", "publish page opened");
         imgAdapter = new ImgAdapter();
         wkVBinding.imgRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         wkVBinding.imgRecyclerView.setAdapter(imgAdapter);

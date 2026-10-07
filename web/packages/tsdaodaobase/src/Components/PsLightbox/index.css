@@ -1,0 +1,224 @@
+/* 图片查看器（PsLightbox） */
+
+body.ps-lightbox-lock {
+    overflow: hidden;
+}
+
+.ps-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* 毛玻璃背景：深紫半透明 + 模糊，随打开 / 关闭淡入淡出 */
+.ps-lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(900px circle at 50% 40%, rgba(124, 58, 237, .22), transparent 70%),
+        rgba(17, 12, 34, .78);
+    backdrop-filter: blur(18px) saturate(1.2);
+    -webkit-backdrop-filter: blur(18px) saturate(1.2);
+    opacity: 0;
+    transition: opacity 380ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.ps-lightbox-open .ps-lightbox-backdrop {
+    opacity: 1;
+}
+
+/* 图片框：位置由脚本写入；展开 / 收回时对 transform 与 clip-path 做过渡 */
+.ps-lightbox-frame {
+    position: fixed;
+    transform-origin: 0 0;
+    will-change: transform, clip-path;
+    transition:
+        transform 380ms cubic-bezier(.2, .9, .25, 1),
+        clip-path 380ms cubic-bezier(.2, .9, .25, 1),
+        opacity 240ms ease,
+        left 320ms cubic-bezier(.2, .8, .2, 1),
+        top 320ms cubic-bezier(.2, .8, .2, 1),
+        width 320ms cubic-bezier(.2, .8, .2, 1),
+        height 320ms cubic-bezier(.2, .8, .2, 1);
+    box-shadow: 0 30px 80px -30px rgba(0, 0, 0, .6);
+    overflow: hidden;
+}
+
+.ps-lightbox-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    cursor: zoom-in;
+    transition: transform 220ms cubic-bezier(.2, .8, .2, 1), opacity 260ms ease, scale 320ms cubic-bezier(.2, .8, .2, 1);
+    opacity: .001;
+    scale: .97;
+}
+
+.ps-lightbox-img.loaded {
+    opacity: 1;
+    scale: 1;
+}
+
+/* 展开动画期间不等加载完成：缩略图已在浏览器缓存里 */
+.ps-lightbox-enter .ps-lightbox-img,
+.ps-lightbox-leave .ps-lightbox-img {
+    opacity: 1;
+    scale: 1;
+}
+
+.ps-lightbox.zoomed .ps-lightbox-img {
+    cursor: grab;
+}
+
+.ps-lightbox-img.dragging {
+    cursor: grabbing;
+    transition: opacity 260ms ease;
+}
+
+/* 右上角玻璃工具栏 */
+.ps-lightbox-bar {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .1);
+    border: 1px solid rgba(255, 255, 255, .14);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #fff;
+    opacity: 0;
+    translate: 0 -8px;
+    transition: opacity 260ms ease 120ms, translate 320ms cubic-bezier(.34, 1.56, .64, 1) 120ms;
+}
+
+.ps-lightbox-open .ps-lightbox-bar,
+.ps-lightbox-open .ps-lightbox-hint,
+.ps-lightbox-open .ps-lightbox-dots {
+    opacity: 1;
+    translate: 0 0;
+}
+
+.ps-lightbox-count {
+    padding: 0 10px;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: rgba(255, 255, 255, .85);
+}
+
+.ps-lightbox-btn,
+.ps-lightbox-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    color: #fff;
+    cursor: pointer;
+    transition: background 160ms ease, scale 220ms cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.ps-lightbox-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: transparent;
+}
+
+.ps-lightbox-btn:hover {
+    background: rgba(255, 255, 255, .16);
+}
+
+.ps-lightbox-btn:active,
+.ps-lightbox-nav:active {
+    scale: .9;
+}
+
+/* 左右切换 */
+.ps-lightbox-nav {
+    position: absolute;
+    top: 50%;
+    width: 46px;
+    height: 46px;
+    margin-top: -23px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .1);
+    border: 1px solid rgba(255, 255, 255, .14);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    opacity: 0;
+    transition: opacity 200ms ease, background 160ms ease, scale 220ms cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.ps-lightbox-nav.prev { left: 22px; }
+.ps-lightbox-nav.next { right: 22px; }
+
+.ps-lightbox-open:hover .ps-lightbox-nav {
+    opacity: 1;
+}
+
+.ps-lightbox-nav:hover {
+    background: rgba(255, 255, 255, .2);
+    scale: 1.06;
+}
+
+/* 底部页码点 */
+.ps-lightbox-dots {
+    position: absolute;
+    left: 50%;
+    bottom: 26px;
+    display: flex;
+    gap: 6px;
+    translate: -50% 8px;
+    opacity: 0;
+    transition: opacity 260ms ease 160ms, translate 320ms ease 160ms;
+}
+
+.ps-lightbox-open .ps-lightbox-dots {
+    translate: -50% 0;
+}
+
+.ps-lightbox-dots i {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, .35);
+    cursor: pointer;
+    transition: width 260ms cubic-bezier(.34, 1.56, .64, 1), background 200ms ease;
+}
+
+.ps-lightbox-dots i.on {
+    width: 18px;
+    background: #fff;
+}
+
+.ps-lightbox-hint {
+    position: absolute;
+    left: 24px;
+    bottom: 22px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, .5);
+    opacity: 0;
+    transition: opacity 400ms ease 300ms;
+}
+
+.ps-lightbox-leave .ps-lightbox-bar,
+.ps-lightbox-leave .ps-lightbox-nav,
+.ps-lightbox-leave .ps-lightbox-dots,
+.ps-lightbox-leave .ps-lightbox-hint {
+    opacity: 0;
+    transition-delay: 0ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ps-lightbox-frame,
+    .ps-lightbox-img,
+    .ps-lightbox-backdrop {
+        transition-duration: 1ms !important;
+    }
+}
