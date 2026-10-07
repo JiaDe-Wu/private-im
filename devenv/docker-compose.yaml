@@ -1,0 +1,66 @@
+# PitchShow 本地开发环境：只跑依赖服务，业务服务端（Go）和 Web 在宿主机上直接跑。
+# 与线上 /opt/tsdd 完全隔离：独立 compose 项目名（pitchshow-dev）、独立数据目录。端口只绑 127.0.0.1，
+# 例外是 18091（WebSocket）和业务服务端的 18090：它们由 CloudFront 回源，靠安全组限制来源；
+# 18100（IM TCP）供 App 直连，对公网开放。
+# 业务服务端监听 172.17.0.1（docker0），供 WuKongIM 容器回调 webhook / datasource。
+name: pitchshow-dev
+services:
+  mysql:
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/mysql:8.0.33
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - TZ=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=demo
+      - MYSQL_DATABASE=tsdd
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 3s
+      retries: 30
+    ports:
+      - "127.0.0.1:13306:3306"
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+  redis:
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/redis:7.2.3
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:16379:6379"
+  im: # IM 长连接网关（基于 WuKongIM，Apache-2.0）
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/wukongim:v2
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - WK_MODE=debug
+      - WK_CONVERSATION_ON=true
+      - WK_TOKENAUTHON=true
+      - WK_WHITELISTOFFOFPERSON=false
+      - WK_EXTERNAL_IP=127.0.0.1
+      - WK_EXTERNAL_TCPADDR=203.0.113.10:18100 # App 端直连（EC2 公网 IP，非弹性 IP，实例重启后会变）
+      - WK_EXTERNAL_WSADDR=ws://localhost:15200
+      - WK_EXTERNAL_WSSADDR=wss://dexample1.cloudfront.net # CloudFront 分发（PitchShowDevWeb 栈 WssAddr），浏览器优先用它
+      - WK_WEBHOOK_GRPCADDR=host.docker.internal:16979
+      - WK_DATASOURCE_ADDR=http://host.docker.internal:18090/v1/datasource
+      - WK_DATASOURCE_CHANNELINFOON=true
+    ports:
+      - "127.0.0.1:15001:5001"  # http api
+      - "127.0.0.1:15100:5100"  # tcp
+      - "18100:5100"  # tcp，App 端直连（安全组 pitchshow-dev-origin 对公网开放）
+      - "127.0.0.1:15200:5200"  # websocket
+      - "18091:5200"  # websocket，供 CloudFront 回源（安全组 pitchshow-dev-origin 只放行 CloudFront）
+      - "127.0.0.1:15300:5300"  # 监控
+    volumes:
+      - ./data/im:/root/wukongim
+  minio: # 已切换到 S3（TS_FILESERVICE=s3），保留用于回滚
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/minio:RELEASE.2023-07-18T17-49-40Z
+    restart: unless-stopped
+    command: "server /data --console-address ':9001'"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    ports:
+      - "127.0.0.1:19000:9000"
+      - "127.0.0.1:19001:9001"
+    volumes:
+      - ./data/minio:/data

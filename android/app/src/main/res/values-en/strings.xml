@@ -1,0 +1,11 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="no_permissions">Authorization fails, some functions of the APP will not be available, please open the application permissions and try again</string>
+    <string name="app_name" tools:ignore="ExtraTranslation">Private IM tool</string>
+    <string name="agree">Agree</string>
+    <string name="disagree">Disagree</string>
+    <string name="app_slogan">Two lines of code to communicate</string>
+    <string name="dialog_title">Welcome to Private IM tool</string>
+    <string name="dialog_content">Before you start, please take a minute to read the user agreement and privacy policy to learn how we protect your personal information:\n\n· We only collect your phone number and device information with your consent, for sign-in and notifications;\n· Chat images and files are stored encrypted and only conversation members can access them;\n· You can view, correct or delete your personal information at any time;\n· We never share your information with third parties without your permission.</string>
+    <string name="main_user_agreement">user agreement</string>
+    <string name="main_privacy_policy">privacy policy</string>
+</resources>

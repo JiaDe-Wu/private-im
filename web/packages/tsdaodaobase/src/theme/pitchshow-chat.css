@@ -1,0 +1,1217 @@
+/* PitchShow 聊天主题
+ * 覆盖唐僧叨叨原有聊天界面样式：会话列表、聊天窗口、消息气泡、输入区、菜单与浮层。
+ * 在 apps/web/src/index.tsx 最后引入，保证在各组件样式之后生效；选择器前缀 body 进一步提高优先级。
+ */
+
+:root {
+    --wk-conversation-footer: 136px;
+    --ps-ink: #1a1a2e;
+    --ps-ink2: #5b5b7a;
+    --ps-ink3: #9a9ab5;
+    --ps-line: #eeebf8;
+    --ps-soft: #f6f4fd;
+    --ps-card: #fff;
+    --ps-accent: #7c3aed;
+    --ps-accent-soft: rgba(124, 58, 237, .1);
+    --ps-grad: linear-gradient(135deg, #6d28d9 0%, #7c3aed 45%, #9b6cf6 100%);
+    --ps-spring: cubic-bezier(.34, 1.56, .64, 1);
+}
+
+body[theme-mode=dark] {
+    --ps-ink: #ececf5;
+    --ps-ink2: #b5b5cc;
+    --ps-ink3: #7d7d98;
+    --ps-line: #2a2a3c;
+    --ps-soft: #1f1f2e;
+    --ps-card: #17171f;
+    --ps-accent-soft: rgba(167, 139, 250, .14);
+}
+
+/* ======================= 左栏：标题与会话列表 ======================= */
+
+body .wk-chat-content-left {
+    background: var(--ps-card);
+    border-right: 1px solid var(--ps-line);
+}
+
+body .wk-chat-search {
+    background: var(--ps-card);
+}
+
+body .wk-chat-title {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    color: var(--ps-ink);
+}
+
+body .wk-chat-search-add {
+    border-radius: 10px;
+    transition: background 160ms ease, color 160ms ease;
+}
+
+body .wk-chat-search-add:hover {
+    background: var(--ps-accent-soft);
+    color: var(--ps-accent);
+}
+
+body .wk-conversationlist {
+    padding: 0 8px 12px;
+    background: var(--ps-card);
+}
+
+body .wk-conversationlist-item {
+    height: 72px;
+    padding: 0;
+    margin-bottom: 2px;
+    border-radius: 14px;
+    background: transparent;
+    transition: background 160ms ease;
+}
+
+body[theme-mode=dark] .wk-conversationlist-item {
+    background: transparent;
+}
+
+body .wk-conversationlist-item:hover {
+    background: var(--ps-soft);
+}
+
+body .wk-conversationlist-item-top {
+    background: rgba(124, 58, 237, .04) !important;
+}
+
+body .wk-conversationlist-item-selected,
+body .wk-conversationlist-item-selected:hover {
+    position: relative;
+    border-radius: 14px;
+    background: var(--ps-accent-soft) !important;
+}
+
+body .wk-conversationlist-item-selected::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 14px;
+    bottom: 14px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: var(--ps-accent);
+}
+
+/* 选中态不再反白文字 */
+body .wk-conversationlist-item-selected .wk-conversationlist-item-name h3,
+body .wk-conversationlist-item-selected .wk-conversationlist-item-name {
+    color: var(--ps-accent);
+}
+
+body .wk-conversationlist-item-selected .wk-conversationlist-item-time {
+    color: var(--ps-ink3);
+}
+
+body .wk-conversationlist-item-selected .wk-conversationlist-item-lastmsg {
+    color: var(--ps-ink2);
+}
+
+body .wk-conversationlist-item-left {
+    width: 64px;
+}
+
+body .wk-conversationlist-item-name h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ps-ink);
+}
+
+body .wk-conversationlist-item-lastmsg {
+    font-size: 13px;
+    color: var(--ps-ink3);
+}
+
+body .wk-conversationlist-item-time {
+    font-size: 11px;
+    color: var(--ps-ink3);
+}
+
+/* [有人@我] / [草稿] 等提示 */
+body .wk-mention,
+body .wk-reminder {
+    color: var(--ps-accent);
+    font-weight: 600;
+}
+
+/* 在线状态：小绿点 / 浅绿胶囊 */
+body .wk-onlinestatusbadge {
+    background: var(--ps-card);
+    padding: 2px;
+}
+
+body .wk-onlinestatusbadge-content {
+    background: #e9f9ef;
+}
+
+body .wk-onlinestatusbadge-content-tip {
+    color: #22a35a;
+    font-weight: 600;
+}
+
+body .wk-onlinestatusbadge-empty .wk-onlinestatusbadge-content {
+    background: #22c55e;
+}
+
+/* ======================= 聊天窗口 ======================= */
+
+body .wk-chat-conversation-header {
+    background: rgba(255, 255, 255, .92);
+    box-shadow: none;
+    border-bottom: 1px solid var(--ps-line);
+    backdrop-filter: blur(12px);
+}
+
+body[theme-mode=dark] .wk-chat-conversation-header {
+    background: rgba(23, 23, 31, .92);
+}
+
+body .wk-chat-conversation-header-channel-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+}
+
+body .wk-chat-conversation-header-channel-info-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ps-ink);
+}
+
+body .wk-chat-conversation-header-channel-info-tip {
+    margin-top: 1px;
+    font-size: 12px;
+    color: var(--ps-ink3);
+}
+
+body .wk-conversation-header-mask {
+    border-radius: 10px;
+}
+
+body .wk-conversation-header-mask:hover {
+    background: var(--ps-accent-soft);
+}
+
+/* 聊天背景：淡淡的薰衣草光晕 + 细点阵 */
+body .wk-conversation-content {
+    background-color: #faf9fe;
+    background-image:
+        radial-gradient(rgba(124, 58, 237, .07) 1px, transparent 1px),
+        radial-gradient(900px circle at 85% 0%, rgba(196, 181, 253, .22), transparent 60%),
+        radial-gradient(700px circle at 0% 100%, rgba(255, 205, 176, .16), transparent 60%);
+    background-size: 22px 22px, auto, auto;
+}
+
+body[theme-mode=dark] .wk-conversation-content {
+    background-color: #121219;
+    background-image:
+        radial-gradient(rgba(167, 139, 250, .08) 1px, transparent 1px),
+        radial-gradient(900px circle at 85% 0%, rgba(124, 58, 237, .16), transparent 60%);
+    background-size: 22px 22px, auto;
+}
+
+/* ---------- 消息气泡 ---------- */
+
+body .svgAppendix {
+    display: none !important; /* 渐变气泡不再使用单色小尾巴，改用一侧小圆角 */
+}
+
+body .wk-message-base-bubble {
+    font-size: 14.5px;
+    line-height: 1.55;
+}
+
+body .wk-message-base-bubble-box.send .wk-message-base-bubble {
+    color: #fff;
+    background: var(--ps-grad);
+    border-radius: 18px 18px 6px 18px;
+    box-shadow: 0 6px 16px -10px rgba(124, 58, 237, .9);
+}
+
+body .wk-message-base-bubble-box.recv .wk-message-base-bubble {
+    color: var(--ps-ink);
+    background: var(--ps-card);
+    border-radius: 18px 18px 18px 6px;
+    box-shadow: 0 1px 2px rgba(13, 13, 26, .04), 0 0 0 1px var(--ps-line);
+}
+
+body[theme-mode=dark] .wk-message-base-bubble-box.recv .wk-message-base-bubble {
+    background: #1f1f2e;
+}
+
+/* 连续消息：中间几条两侧都收紧 */
+body .wk-message-base-bubble-box.send.first .wk-message-base-bubble { border-radius: 18px 18px 6px 18px; }
+body .wk-message-base-bubble-box.send.middle .wk-message-base-bubble { border-radius: 18px 6px 6px 18px; }
+body .wk-message-base-bubble-box.send.last .wk-message-base-bubble { border-radius: 18px 6px 18px 18px; }
+body .wk-message-base-bubble-box.recv.first .wk-message-base-bubble { border-radius: 18px 18px 18px 6px; }
+body .wk-message-base-bubble-box.recv.middle .wk-message-base-bubble { border-radius: 6px 18px 18px 6px; }
+body .wk-message-base-bubble-box.recv.last .wk-message-base-bubble { border-radius: 6px 18px 18px 18px; }
+
+/* 图片、贴纸等无底色消息保持透明 */
+body .wk-message-base-bubble-box.hide .wk-message-base-bubble {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+body .wk-message-base-bubble-box.send .messageTime,
+body .wk-message-base-bubble-box.send .messageTime * {
+    color: rgba(255, 255, 255, .75) !important;
+}
+
+body .senderAvatar img {
+    border-radius: 12px;
+}
+
+body .senderName,
+body .messageNameBox {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* @ 提及高亮 */
+body .wk-message-text-mention,
+body .wk-message-base-bubble-box.recv .mention {
+    color: var(--ps-accent);
+    font-weight: 600;
+}
+
+/* ---------- 时间分隔、历史分隔、系统提示：胶囊 ---------- */
+
+body .wk-message-time-box,
+body .wk-message-split-box {
+    width: auto;
+    padding: 14px 0 6px;
+}
+
+body .wk-message-time-line1,
+body .wk-message-time-line2,
+body .wk-message-split-line1,
+body .wk-message-split-line2 {
+    background-image: none !important;
+}
+
+body .wk-message-time,
+body .wk-message-split-content {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--ps-ink2);
+    background: rgba(255, 255, 255, .85);
+    box-shadow: 0 0 0 1px var(--ps-line);
+}
+
+body .wk-message-split-content {
+    color: var(--ps-accent);
+    background: var(--ps-accent-soft);
+    box-shadow: none;
+}
+
+body .wk-message-system {
+    display: table;
+    width: auto;
+    max-width: 80%;
+    margin: 10px auto 4px;
+    padding: 4px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--ps-ink2);
+    background: rgba(13, 13, 26, .04);
+}
+
+body[theme-mode=dark] .wk-message-time,
+body[theme-mode=dark] .wk-message-system {
+    background: rgba(255, 255, 255, .06);
+}
+
+/* ---------- 回到底部 / @ 提醒 悬浮按钮 ---------- */
+
+body .wk-conversationpositionview-item {
+    background: var(--ps-card);
+    color: var(--ps-accent);
+    box-shadow: 0 10px 24px -12px rgba(76, 29, 149, .5), 0 0 0 1px var(--ps-line);
+    transition: translate 200ms ease, box-shadow 200ms ease;
+}
+
+body .wk-conversationpositionview-item:hover {
+    translate: 0 -2px;
+}
+
+body .wk-conversationpositionview-item .wk-conversation-unread-count {
+    background: var(--ps-accent);
+}
+
+/* ======================= 输入区：圆角卡片 ======================= */
+
+body .wk-conversation-footer {
+    padding: 0 18px 16px;
+    box-sizing: border-box;
+    background: transparent;
+}
+
+body .wk-messageinput-box {
+    display: flex;
+    flex-direction: column;
+    border-radius: 18px;
+    background: var(--ps-card);
+    box-shadow: 0 0 0 1.5px var(--ps-line), 0 12px 28px -18px rgba(76, 29, 149, .35);
+    transition: box-shadow 200ms ease;
+}
+
+body .wk-messageinput-box:focus-within {
+    box-shadow: 0 0 0 1.5px #a78bfa, 0 0 0 5px rgba(167, 139, 250, .18), 0 12px 28px -18px rgba(76, 29, 149, .45);
+}
+
+body[theme-mode=dark] .wk-messageinput-box {
+    background: #1f1f2e;
+}
+
+body .wk-messageinput-bar {
+    height: 36px;
+    padding: 4px 8px 0;
+    box-sizing: border-box;
+}
+
+/* 注意：这里不能用 scale/transform —— 表情面板绝对定位在按钮内部，变换会让按钮成为它的定位容器而把面板压窄 */
+body .wk-conversation-chattoolbars-item,
+body .wk-messageinput-actionitem {
+    border-radius: 9px;
+    transition: background 150ms ease;
+}
+
+body .wk-conversation-chattoolbars-item:hover,
+body .wk-messageinput-actionitem:hover {
+    background: var(--ps-accent-soft);
+}
+
+body .wk-messageinput-inputbox {
+    position: relative;
+    flex: 1;
+    height: auto;
+    padding: 0 116px 8px 12px;
+}
+
+body .wk-messageinput-input__control,
+body[theme-mode=dark] .wk-messageinput-input__control {
+    background: transparent;
+}
+
+/* 发送按钮 */
+body .ps-send {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ps-ink3);
+    background: var(--ps-soft);
+    cursor: default;
+    transition: background 200ms ease, color 200ms ease, box-shadow 200ms ease, translate 160ms ease, scale 200ms var(--ps-spring);
+}
+
+body .ps-send.ps-send-ready {
+    color: #fff;
+    background: var(--ps-grad);
+    box-shadow: 0 8px 18px -8px rgba(124, 58, 237, .85);
+    cursor: pointer;
+}
+
+body .ps-send.ps-send-ready:hover {
+    translate: 0 -1px;
+}
+
+body .ps-send.ps-send-ready:active {
+    scale: .96;
+}
+
+body .ps-send.ps-send-ready svg {
+    animation: ps-send-nudge 1.6s ease-in-out infinite;
+}
+
+body .ps-input-hint {
+    position: absolute;
+    right: 14px;
+    bottom: -18px;
+    font-size: 11px;
+    color: var(--ps-ink3);
+    opacity: 0;
+    transition: opacity 200ms ease;
+    pointer-events: none;
+}
+
+body .wk-messageinput-box:focus-within .ps-input-hint {
+    opacity: 1;
+}
+
+/* 回复引用条 */
+body .wk-conversation-topview,
+body .wk-replyview {
+    border-radius: 14px 14px 0 0;
+}
+
+/* @ 成员候选 */
+body .wk-messageinput-input__suggestions {
+    border-radius: 14px !important;
+    overflow: hidden;
+    box-shadow: 0 16px 36px -16px rgba(76, 29, 149, .45) !important;
+}
+
+/* ======================= 菜单与浮层 ======================= */
+
+/* 右键菜单 */
+body .wk-contextmenus {
+    padding: 6px;
+    border-radius: 14px;
+    border: 1px solid var(--ps-line);
+    box-shadow: 0 20px 40px -18px rgba(76, 29, 149, .45);
+}
+
+body .wk-contextmenus li {
+    border-radius: 9px;
+    font-size: 14px;
+}
+
+body .wk-contextmenus li:hover {
+    color: var(--ps-accent);
+    background: var(--ps-accent-soft) !important;
+}
+
+/* 左上角「+」菜单 */
+body .wk-chatmenuspopover ul {
+    padding: 6px;
+    border-radius: 14px;
+    border: 1px solid var(--ps-line);
+    box-shadow: 0 20px 40px -18px rgba(76, 29, 149, .45);
+}
+
+body .wk-chatmenuspopover li {
+    border-radius: 9px;
+    transition: background 150ms ease;
+}
+
+body .wk-chatmenuspopover li:hover {
+    background: var(--ps-accent-soft);
+}
+
+/* 表情面板 */
+body .wk-emojitoolbar-emojipanel {
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--ps-line);
+    box-shadow: 0 24px 48px -20px rgba(76, 29, 149, .45);
+}
+
+body .wk-emojipanel-tab-item-selected {
+    background: var(--ps-accent-soft);
+    border-radius: 10px;
+}
+
+/* 群设置抽屉 */
+body .wk-chat-channelsetting {
+    border-left: 1px solid var(--ps-line);
+    box-shadow: -18px 0 40px -28px rgba(76, 29, 149, .4);
+}
+
+@keyframes ps-send-nudge {
+    0%, 70%, 100% { translate: 0 0; }
+    80% { translate: 2px -2px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body .ps-send svg { animation: none !important; }
+}
+
+/* 顶部栏：名字与副标题上下排列 */
+body .wk-chat-conversation-header-channel-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1.3;
+}
+
+/* ======================= 群设置 / 单聊设置 抽屉 ======================= */
+
+body .wk-chat-channelsetting,
+body .wk-channelsetting,
+body .wk-channelsetting-content {
+    background: var(--ps-soft);
+}
+
+body .wk-channelsetting-header {
+    background: var(--ps-soft);
+}
+
+body .wk-channelsetting-header-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ps-ink);
+}
+
+body .wk-channelsetting-close {
+    border-radius: 10px;
+}
+
+body .wk-channelsetting-close:hover {
+    background: var(--ps-accent-soft);
+}
+
+/* 每个分组是一张白色圆角卡片 */
+body .wk-channelsetting-content .wk-section {
+    margin: 10px 12px 0;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--ps-card);
+    box-shadow: 0 0 0 1px var(--ps-line);
+}
+
+body .wk-channelsetting-content .wk-section:first-child {
+    margin-top: 4px;
+}
+
+body .wk-channelsetting-content .wk-list-item {
+    padding: 14px 16px;
+    background: transparent;
+    transition: background 150ms ease;
+}
+
+body .wk-channelsetting-content .wk-list-item:hover {
+    background: var(--ps-soft);
+}
+
+body .wk-channelsetting-content .wk-list-item + .wk-list-item,
+body .wk-channelsetting-content .wk-section-row + .wk-section-row .wk-list-item {
+    box-shadow: inset 0 1px 0 var(--ps-line);
+}
+
+body .wk-list-item-title {
+    font-size: 14px;
+    color: var(--ps-ink);
+}
+
+body .wk-list-item-subtitle,
+body .wk-list-item-tip {
+    color: var(--ps-ink3);
+}
+
+/* 危险操作：清空聊天记录 / 删除并退出（组件里是内联 red） */
+body .wk-list-item-title[style*="red"] {
+    width: 100%;
+    text-align: center;
+    color: #e5484d !important;
+    font-weight: 600;
+}
+
+body .wk-list-item:has(.wk-list-item-title[style*="red"]):hover {
+    background: rgba(229, 72, 77, .06);
+}
+
+/* 群成员 */
+body .wk-subscribers-content {
+    padding: 12px 8px 4px;
+}
+
+body .wk-subscribers-item {
+    width: 62px;
+    height: 78px;
+    border-radius: 12px;
+    transition: background 150ms ease;
+}
+
+body .wk-subscribers-item:hover {
+    background: var(--ps-soft);
+}
+
+body .wk-subscribers-item img {
+    width: 44px;
+    height: 44px;
+    margin-top: 4px;
+    border-radius: 50%;
+}
+
+body .wk-subscribers-item-name {
+    margin-top: 4px;
+    color: var(--ps-ink2);
+}
+
+body .wk-subscribers-more {
+    color: var(--ps-accent);
+}
+
+/* 开关：打开时品牌紫 */
+body .semi-switch-checked {
+    background-color: var(--ps-accent) !important;
+}
+
+body .semi-switch-checked:hover {
+    background-color: #6d28d9 !important;
+}
+
+/* ======================= 特殊消息 ======================= */
+
+/* 图片：去掉气泡底框，圆角 + 悬停微放大 */
+body .wk-message-base-bubble:has(.wk-message-image) {
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+body .wk-message-image {
+    overflow: hidden;
+    border-radius: 14px;
+    box-shadow: 0 10px 24px -16px rgba(13, 13, 26, .45), 0 0 0 1px rgba(13, 13, 26, .05);
+}
+
+body .wk-message-image img {
+    display: block;
+    object-fit: cover;
+    transition: scale 400ms ease;
+}
+
+body .wk-message-image:hover img {
+    scale: 1.03;
+}
+
+/* 名片 */
+body .wk-message-base-bubble:has(.wk-message-card) {
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+body .wk-message-card {
+    width: 260px;
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--ps-card);
+    box-shadow: 0 0 0 1px var(--ps-line), 0 10px 24px -18px rgba(76, 29, 149, .5);
+    transition: box-shadow 200ms ease, translate 200ms ease;
+}
+
+body .wk-message-card:hover {
+    translate: 0 -1px;
+    box-shadow: 0 0 0 1px #c4b5fd, 0 14px 28px -18px rgba(76, 29, 149, .6);
+}
+
+body .wk-message-card-content {
+    gap: 12px;
+    padding: 14px;
+    background: linear-gradient(135deg, rgba(196, 181, 253, .22), rgba(255, 205, 176, .18));
+}
+
+body .wk-message-card-content img,
+body .wk-message-card-content .wk-avatar {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+}
+
+body .wk-message-card-content-name {
+    margin-left: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ps-ink);
+}
+
+body .wk-message-card-bottom {
+    padding: 8px 14px;
+    border-top: 1px solid var(--ps-line);
+}
+
+body .wk-message-card-bottom-flag {
+    font-size: 11.5px;
+    color: var(--ps-ink3);
+}
+
+body .wk-message-card-bottom-time {
+    top: 8px;
+    right: 14px;
+    color: var(--ps-ink3) !important;
+}
+
+/* 语音：紫色圆形播放键 */
+body .voicePlay {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    color: #fff;
+    background: var(--ps-grad);
+    box-shadow: 0 6px 14px -6px rgba(124, 58, 237, .8);
+    transition: scale 200ms var(--ps-spring);
+}
+
+body .voicePlay:hover {
+    scale: 1.06;
+}
+
+body .wk-message-base-bubble-box.send .voicePlay {
+    color: var(--ps-accent);
+    background: #fff;
+    box-shadow: none;
+}
+
+body .wk-message-base-bubble-box.recv .voicePlay {
+    background: var(--ps-grad);
+}
+
+body .voicePlay .icon-play::before,
+body .voicePlay .icon-pause::before {
+    color: inherit;
+}
+
+body .wk-message-voice-info-time {
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* 引用回复：左侧竖条 + 半透明底 */
+body .wk-message-text-reply {
+    margin: 2px 0 6px;
+    padding: 6px 10px;
+    border-left: 3px solid rgba(255, 255, 255, .7);
+    border-radius: 4px 10px 10px 4px;
+    color: rgba(255, 255, 255, .78);
+    background: rgba(255, 255, 255, .14);
+    font-size: 12.5px;
+}
+
+body .wk-message-text-reply.wk-message-text-reply-recv {
+    border-left-color: var(--ps-accent);
+    color: var(--ps-ink2);
+    background: var(--ps-accent-soft);
+}
+
+body .wk-message-text-reply-authorname {
+    font-weight: 600;
+}
+
+/* ======================= 资料卡 ======================= */
+
+body .wk-userinfo-content {
+    background: var(--ps-soft);
+}
+
+body .wk-userinfo-header {
+    position: relative;
+    padding-bottom: 6px;
+    background: linear-gradient(135deg, rgba(196, 181, 253, .35), rgba(255, 205, 176, .3));
+}
+
+body .wk-userinfo-user-avatar img {
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 50% !important;
+    box-shadow: 0 0 0 3px #fff, 0 10px 20px -10px rgba(76, 29, 149, .5);
+}
+
+body .wk-userinfo-user-info-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ps-ink);
+}
+
+body .wk-userinfo-user-info-others {
+    font-size: 12px;
+    color: var(--ps-ink2);
+}
+
+body .wk-userinfo-sections .wk-section {
+    margin: 10px 12px 0;
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--ps-card);
+    box-shadow: 0 0 0 1px var(--ps-line);
+}
+
+body .wk-userinfo-sections .wk-list-item {
+    padding: 13px 16px;
+    background: transparent;
+}
+
+body .wk-userinfo-sections .wk-list-item:hover {
+    background: var(--ps-soft);
+}
+
+body .wk-userinfo-sections .wk-section-row + .wk-section-row .wk-list-item {
+    box-shadow: inset 0 1px 0 var(--ps-line);
+}
+
+body .wk-userInfo-footer {
+    background: var(--ps-soft);
+}
+
+/* 外层是留白容器，真正的按钮在里面 */
+body .wk-userinfo-footer-sendbutton button,
+body .wk-userinfo-footer-sendbutton .semi-button {
+    height: 44px;
+    border: 0;
+    border-radius: 14px !important;
+    font-size: 15px;
+    font-weight: 600;
+    background: var(--ps-grad) !important;
+    box-shadow: 0 10px 20px -10px rgba(124, 58, 237, .8);
+}
+
+/* 模态框通用圆角 */
+body .semi-modal-content {
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+/* ======================= 转发：选择会话 ======================= */
+
+body .wk-conversationselect-content-title {
+    font-size: 16px;
+    font-weight: 600;
+    background: var(--ps-card);
+    border-bottom: 1px solid var(--ps-line);
+}
+
+body .wk-conversationselect-content-searchBox {
+    width: calc(100% - 32px);
+    height: 44px;
+    margin: 10px 16px 4px;
+    padding: 0 12px;
+    box-sizing: border-box;
+    border-radius: 12px;
+    background: var(--ps-soft);
+    border: 1.5px solid transparent;
+    transition: border-color 160ms ease, box-shadow 200ms ease;
+}
+
+body .wk-conversationselect-content-searchBox:focus-within {
+    border-color: #a78bfa;
+    background: var(--ps-card);
+    box-shadow: 0 0 0 3px rgba(167, 139, 250, .18);
+}
+
+body .wk-conversationselect-content-searchInput {
+    background: transparent;
+}
+
+body .wk-conversationselect-content-header {
+    padding: 6px 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ps-accent);
+    background: transparent;
+}
+
+body .wk-conversationselect-content-box {
+    border-radius: 12px;
+    transition: background 150ms ease;
+}
+
+body .wk-conversationselect-content-box:hover {
+    background: var(--ps-soft);
+}
+
+body .wk-conversationselect-content-box .wk-avatar,
+body .wk-conversationselect-content-box img {
+    border-radius: 50%;
+}
+
+body .wk-conversationselect-footer {
+    background: var(--ps-card);
+    border-top: 1px solid var(--ps-line);
+}
+
+body .wk-conversationselect-okBtn {
+    min-width: 140px;
+    height: 40px;
+    border-radius: 12px !important;
+    font-weight: 600;
+    background: var(--ps-grad) !important;
+    box-shadow: 0 10px 20px -10px rgba(124, 58, 237, .8);
+}
+
+/* 圆形勾选框：选中为品牌紫 */
+body .wk-check .semi-checkbox-inner-display,
+body .wk-check-display {
+    border-radius: 50% !important;
+}
+
+body .semi-checkbox-checked .semi-checkbox-inner-display {
+    background: var(--ps-accent) !important;
+    border-color: var(--ps-accent) !important;
+}
+
+/* ======================= 全局搜索 ======================= */
+
+body .semi-input-wrapper:has(+ .wk-search-tabs),
+body .semi-modal-body .semi-input-wrapper {
+    border-radius: 12px;
+}
+
+body .semi-input-wrapper-focus {
+    border-color: #a78bfa !important;
+    box-shadow: 0 0 0 3px rgba(167, 139, 250, .18);
+}
+
+body .wk-search-tabs .semi-tabs-tab-active,
+body .semi-tabs-tab-active {
+    color: var(--ps-accent) !important;
+}
+
+body .semi-tabs-bar-line .semi-tabs-tab-active::after,
+body .semi-tabs-ink-bar {
+    background: var(--ps-accent) !important;
+}
+
+body .wk-item-contacts,
+body .wk-item-group,
+body .wk-item-message,
+body .wk-item-file {
+    border-radius: 12px;
+    transition: background 150ms ease;
+}
+
+body .wk-item-contacts:hover,
+body .wk-item-group:hover,
+body .wk-item-message:hover,
+body .wk-item-file:hover {
+    background: var(--ps-soft);
+}
+
+body .wk-item-contacts img,
+body .wk-item-group img {
+    border-radius: 50%;
+}
+
+body .wk-item-contacts mark,
+body .wk-item-group mark,
+body .wk-item-message mark,
+body .wk-item-file mark {
+    padding: 0 2px;
+    border-radius: 4px;
+    color: var(--ps-accent);
+    background: rgba(167, 139, 250, .22);
+}
+
+/* ======================= 二级页面 ======================= */
+
+/* 我的资料：分组卡片（与群设置一致） */
+body .wk-meinfo {
+    background: var(--ps-soft);
+}
+
+body .wk-meinfo-sections .wk-section {
+    margin: 10px 12px 0;
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--ps-card);
+    box-shadow: 0 0 0 1px var(--ps-line);
+}
+
+body .wk-meinfo-sections .wk-list-item {
+    padding: 14px 16px;
+    background: transparent;
+}
+
+body .wk-meinfo-sections .wk-list-item:hover {
+    background: var(--ps-soft);
+}
+
+body .wk-meinfo-sections .wk-section-row + .wk-section-row .wk-list-item {
+    box-shadow: inset 0 1px 0 var(--ps-line);
+}
+
+body .wk-list-item-avatar img {
+    border-radius: 50% !important;
+}
+
+/* 页头「完成」按钮：品牌紫渐变，禁用时浅灰 */
+body .wk-route-header-right-view .semi-button-primary,
+body .wk-channelsetting-header-right-view .semi-button-primary,
+body .wk-viewqueueheader-content-action .semi-button-primary {
+    height: 32px;
+    padding: 0 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    background: var(--ps-grad) !important;
+    box-shadow: 0 6px 14px -6px rgba(124, 58, 237, .8);
+}
+
+body .wk-route-header-right-view .semi-button-primary.semi-button-disabled,
+body .wk-channelsetting-header-right-view .semi-button-primary.semi-button-disabled,
+body .wk-viewqueueheader-content-action .semi-button-primary.semi-button-disabled {
+    color: var(--ps-ink3) !important;
+    background: var(--ps-soft) !important;
+    box-shadow: none;
+}
+
+/* 文本编辑页（群公告、群名称、群昵称、备注） */
+body .wk-inputedit {
+    height: auto;
+    padding: 12px;
+    box-sizing: border-box;
+}
+
+body .wk-inputedit .semi-input-textarea-wrapper {
+    border-radius: 14px;
+    border: 1.5px solid var(--ps-line);
+    background: var(--ps-card);
+    transition: border-color 160ms ease, box-shadow 200ms ease;
+}
+
+body .wk-inputedit .semi-input-textarea-wrapper:hover {
+    border-color: #d8d0f6;
+    background: var(--ps-card);
+}
+
+body .wk-inputedit .semi-input-textarea-wrapper-focus,
+body .wk-inputedit .semi-input-textarea-wrapper:focus-within {
+    border-color: #a78bfa;
+    box-shadow: 0 0 0 4px rgba(167, 139, 250, .18);
+}
+
+body .wk-inputedit .semi-input-textarea {
+    padding: 12px 14px;
+    font-size: 14.5px;
+    line-height: 1.6;
+}
+
+body .wk-inputedit .semi-input-textarea-counter {
+    padding: 0 12px 8px;
+    color: var(--ps-ink3);
+}
+
+body .wk-inputedit-placeholder {
+    margin: 10px 4px 0;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--ps-ink3);
+}
+
+/* 二维码卡片（我的二维码 / 群二维码） */
+body .wk-qrcodemy,
+body .wk-channelqrcode {
+    background: var(--ps-soft);
+}
+
+body .wk-qrcodemy-content-qrcodebox,
+body .wk-channelqrcode-box {
+    position: relative;
+    margin: 16px;
+    padding: 22px 18px 18px;
+    border-radius: 22px;
+    background: var(--ps-card);
+    box-shadow: 0 0 0 1px var(--ps-line), 0 24px 48px -28px rgba(76, 29, 149, .55);
+    overflow: hidden;
+}
+
+body .wk-qrcodemy-content-qrcodebox::before,
+body .wk-channelqrcode-box::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 96px;
+    background: linear-gradient(135deg, rgba(196, 181, 253, .45), rgba(255, 205, 176, .4));
+    pointer-events: none;
+}
+
+body .wk-qrcodemy-content-qrcodeinfo,
+body .wk-qrcodemy-content-userinfo,
+body .wk-channelqrcode-info {
+    position: relative;
+}
+
+body .wk-qrcodemy-content-userinfo img,
+body .wk-channelqrcode-info-avatar img {
+    border-radius: 50% !important;
+    box-shadow: 0 0 0 3px #fff, 0 8px 18px -8px rgba(76, 29, 149, .5);
+}
+
+body .wk-qrcodemy-content-userinfo-name,
+body .wk-channelqrcode-info-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ps-ink);
+}
+
+body .wk-qrcodemy-content-qrcode,
+body .wk-channelqrcode-qrcode {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-top: 14px;
+}
+
+body .wk-qrcodemy-content-qrcode canvas,
+body .wk-channelqrcode-qrcode canvas {
+    padding: 10px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 0 0 1px var(--ps-line);
+}
+
+body .wk-qrcodemy-content-tip,
+body .wk-channelqrcode-expire {
+    margin-top: 12px;
+    font-size: 12px;
+    text-align: center;
+    color: var(--ps-ink3);
+}
+
+/* 发起群聊（选择成员） */
+body .wk-organizational-group-new-left {
+    background: var(--ps-soft);
+}
+
+body .wk-organizational-group-new-left .group-new-left-search .semi-input-wrapper {
+    border-radius: 12px;
+    background: var(--ps-card);
+}
+
+body .group-new-left-main .friend-opt .friend-opt-main .friend-opt-item {
+    border-radius: 12px;
+    transition: background 150ms ease;
+}
+
+body .group-new-left-main .friend-opt .friend-opt-main .friend-opt-item:hover {
+    background: var(--ps-card);
+}
+
+body .wk-organizational-group-new-right .organizational-group-new-right-title {
+    font-weight: 600;
+    color: var(--ps-ink);
+}
+
+body .wk-organizational-group-new-right .wk-avatar,
+body .wk-organizational-group-new-left .wk-avatar {
+    border-radius: 50% !important;
+}
+
+body .wk-organizational-group-new-right .semi-button {
+    height: 36px;
+    min-width: 84px;
+    border-radius: 11px;
+    font-weight: 600;
+}
+
+body .wk-organizational-group-new-right .wk-but-ok,
+body .wk-organizational-group-new-right .semi-button-primary.semi-button-solid {
+    background: var(--ps-grad) !important;
+    box-shadow: 0 8px 16px -8px rgba(124, 58, 237, .8);
+}
+
+/* Semi 全局提示（Toast） */
+body .semi-toast-content {
+    border-radius: 14px;
+    box-shadow: 0 16px 32px -16px rgba(76, 29, 149, .45);
+}

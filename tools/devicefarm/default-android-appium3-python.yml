@@ -1,0 +1,114 @@
+version: 0.1
+
+# This field allows you to select which Device Farm Android test host is used for your test run. 
+# For more information, please see 
+# https://docs.aws.amazon.com/devicefarm/latest/developerguide/custom-test-environments-hosts.html
+android_test_host: amazon_linux_2
+
+# Phases represent collections of commands that are executed during your test run on the test host.
+phases:
+
+  # The install phase contains commands for installing dependencies to run your tests.
+  # Certain frequently used dependencies are preinstalled on the test host to accelerate and 
+  # simplify your test setup. To find these dependencies, versions supported and additional 
+  # software installation please see: 
+  # https://docs.aws.amazon.com/devicefarm/latest/developerguide/custom-test-environments-hosts-software.html
+  install:
+    commands:
+      # The Appium server is written using Node.js. In order to run your desired version of Appium,
+      # you first need to set up a Node.js environment that is compatible with your version of Appium.
+      - devicefarm-cli use node 22
+      - node --version
+
+      # Use the devicefarm-cli to select a preinstalled major version of Appium.
+      - devicefarm-cli use appium 3
+      - appium --version
+
+      # The Device Farm service periodically updates the preinstalled Appium versions over time to
+      # incorporate the latest minor and patch versions for each major version. If you wish to
+      # select a specific version of Appium, you can use NPM to install it.
+      # - npm install -g appium@3.3.0
+
+      # When running Android tests with Appium version 3, the UiAutomator2 driver
+      # version 6 is pre-installed.
+      # If you want to install a different version of the driver,
+      # you can use the Appium extension CLI to uninstall the existing uiautomator2 driver
+      # and install your desired version:
+      # - |-
+      #   if [ $DEVICEFARM_DEVICE_PLATFORM_NAME = "Android" ];
+      #   then
+      #     appium driver uninstall uiautomator2;
+      #     appium driver install uiautomator2@7.1.2;
+      #   fi;
+
+      # Based on Appium framework's recommendation, we recommend setting the Appium server's
+      # base path explicitly for accepting commands. For Appium 3, this is empty by default.
+      # If you prefer the legacy base path of /wd/hub, please set it here.
+      - export APPIUM_BASE_PATH=
+
+      # Use the devicefarm-cli to select the Python environment for your test execution.
+      - devicefarm-cli use python 3.11
+      - python --version
+
+      # Install the Python dependencies for your test package using pip.
+      - cd $DEVICEFARM_TEST_PACKAGE_PATH
+      - python -m pip install -r requirements.txt
+
+  # The pre-test phase contains commands for setting up your test environment.
+  pre_test:
+    commands:
+      # We recommend starting the Appium server process in the background using the command below.
+      # The Appium server log will be written to the $DEVICEFARM_LOG_DIR directory.
+      # The environment variables passed as capabilities to the server will be automatically assigned
+      # during your test run based on your test's specific device.
+      # For more information about which environment variables are set and how they're set, please see
+      # https://docs.aws.amazon.com/devicefarm/latest/developerguide/custom-test-environment-variables.html
+      - |-
+        appium --base-path=$APPIUM_BASE_PATH --log-timestamp \
+          --log-no-colors --relaxed-security --default-capabilities \
+          "{\"appium:deviceName\": \"$DEVICEFARM_DEVICE_NAME\", \
+          \"platformName\": \"$DEVICEFARM_DEVICE_PLATFORM_NAME\", \
+          \"appium:app\": \"$DEVICEFARM_APP_PATH\", \
+          \"appium:udid\":\"$DEVICEFARM_DEVICE_UDID\", \
+          \"appium:platformVersion\": \"$DEVICEFARM_DEVICE_OS_VERSION\", \
+          \"appium:automationName\": \"UiAutomator2\"}" \
+          >> $DEVICEFARM_LOG_DIR/appium.log 2>&1 &
+
+      # This code snippet is to wait until the Appium server starts.
+      - |-
+        appium_initialization_time=0;
+        until curl --silent --fail "http://0.0.0.0:4723${APPIUM_BASE_PATH}/status"; do
+          if [[ $appium_initialization_time -gt 30 ]]; then
+            echo "Appium did not start within 30 seconds. Exiting...";
+            exit 1;
+          fi;
+          appium_initialization_time=$((appium_initialization_time + 1));
+          echo "Waiting for Appium to start on port 4723...";
+          sleep 1;
+        done;
+
+  # The test phase contains commands for running your tests.
+  test:
+    commands:
+      # Your test package is downloaded and unpackaged into the $DEVICEFARM_TEST_PACKAGE_PATH directory.
+      - cd $DEVICEFARM_TEST_PACKAGE_PATH
+      - echo "Starting the Appium Python test"
+      
+      # The following sample command should run your all your Appium tests. You can modify it to suit your requirements.
+      # Please refer to "https://docs.pytest.org/en/latest/usage.html" for more options
+      # on running pytest from the command line.
+      - python -m pytest tests/ --junit-xml $DEVICEFARM_LOG_DIR/junitreport.xml
+
+  # The post-test phase contains commands that are run after your tests have completed.
+  # If you need to run any commands to generate logs and reports on how your test performed,
+  # we recommend adding them to this section.
+  post_test:
+    commands:
+
+# Artifacts are a list of paths on the filesystem where you can store test output and reports.
+# All files in these paths will be collected by Device Farm, with certain limits (see limit details
+# here: https://docs.aws.amazon.com/devicefarm/latest/developerguide/limits.html#file-limits).
+# These files will be available through the ListArtifacts API as your "Customer Artifacts".
+artifacts:
+  # By default, Device Farm will collect your artifacts from the $DEVICEFARM_LOG_DIR directory.
+  - $DEVICEFARM_LOG_DIR

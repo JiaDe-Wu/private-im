@@ -1,0 +1,48 @@
+# ---- 运行数据与环境（不入库）----
+devenv/data/
+devenv/*.log
+bin/
+*.log
+
+# ---- 依赖与编译产物 ----
+node_modules/
+build/
+dist/
+cdk.out/
+.gradle/
+*.tsbuildinfo
+tools/venv/
+__pycache__/
+
+# ---- 测试产物 ----
+tools/devicefarm/results/
+tools/devicefarm/test-package.zip
+tools/devicefarm/watcher.log
+tools/.devicefarm_project
+
+# ---- 本地配置 / 密钥 ----
+.env.*local
+local.properties
+*.jks
+*.keystore
+.DS_Store
+.idea/
+.vscode/
+
+# ---- 品牌素材的临时输出 ----
+brand/preview/
+brand/shots/
+brand/raw/
+
+# ---- 过程素材（可由脚本重新生成，或仅用于挑选）----
+devenv/seed/photos-src/
+devenv/seed/.aidlc_group_no
+brand/avatars/out/
+devenv/seed/assets/*
+!devenv/seed/assets/photos/
+!devenv/seed/assets/CREDITS.md
+brand/chat/
+brand/media/
+brand/sub/
+brand/ui/
+brand/avatars/*.png

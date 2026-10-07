@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.chat.moments.view.SquareFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="3dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/imgIv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/removeIv"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_gravity="end|top"
+        android:layout_margin="4dp"
+        android:background="@drawable/ps_moment_pill"
+        android:padding="4dp"
+        android:src="@drawable/ic_moment_close" />
+</com.chat.moments.view.SquareFrameLayout>

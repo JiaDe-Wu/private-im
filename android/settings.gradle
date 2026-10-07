@@ -1,0 +1,28 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+        maven {url 'https://developer.huawei.com/repo/'}
+        maven {
+            url "https://maven.google.com"
+        }
+    }
+}
+rootProject.name = "PitchShowAndroid"
+include ':MyLibs:rlottie'
+include ':app'
+include ':wkbase'
+include ':wkuikit'
+include ':wkscan'
+include ':wklogin'
+include ':wkmoments'
+// include ':wkpush'  // 第一阶段不做离线推送

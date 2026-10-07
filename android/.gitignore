@@ -1,0 +1,27 @@
+*.iml
+.gradle
+.idea
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/app/build
+/wkbase/build
+/wklogin/build
+/wkscan/build
+/wkpush/build
+/wkuikit/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+/.vscode
+/wkmoments/build
+
+# 各模块编译产物
+**/build/

@@ -1,0 +1,20 @@
+{
+  "short_name": "Private IM",
+  "name": "Private IM tool",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 48x48 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#7c3aed",
+  "background_color": "#ffffff"
+}

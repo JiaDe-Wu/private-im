@@ -1,0 +1,979 @@
+/* PitchShow 登录页（浅色）
+ * 动效分层：背景（光斑漂移 + 鼠标聚光 + 点阵） → 左侧展示（逐字标题 + 演示对话 + 浮动标签，视差）
+ * → 右侧卡片（入场、旋转渐变描边、鼠标倾斜、表单切换、出错抖动、成功彩纸）。
+ * 鼠标位置由 login.tsx 写入 --mx / --my（0~1）。视差与倾斜用 transform，入场/抖动等关键帧用独立的
+ * translate / scale 属性，两者互不覆盖。
+ */
+
+@property --wk-login-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+}
+
+.wk-login {
+    --mx: .5;
+    --my: .5;
+    --p600: #7c3aed;
+    --p500: #8b5cf6;
+    --p400: #a78bfa;
+    --p300: #c4b5fd;
+    --ink: #0d0d1a;
+    --ink2: #4a4a6a;
+    --ink3: #8a8aaa;
+    --peach: #FF9A80;
+    --spring: cubic-bezier(.34, 1.56, .64, 1);
+    --ease: cubic-bezier(.65, 0, .35, 1);
+
+    position: absolute;
+    inset: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    color: var(--ink);
+    background: linear-gradient(160deg, #ffffff 0%, #f6f4ff 45%, #fdf3f0 100%);
+    font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+.wk-login button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+/* ---------------- 背景 ---------------- */
+
+.wk-login-bg {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.wk-login-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    opacity: .55;
+    transform: translate(calc((var(--mx) - .5) * -40px), calc((var(--my) - .5) * -30px));
+    transition: transform 600ms ease-out;
+}
+
+.wk-login-blob.a {
+    width: 46vw;
+    height: 46vw;
+    left: -10vw;
+    top: -14vw;
+    background: radial-gradient(circle at 30% 30%, #c4b5fd, #a78bfa 60%, transparent 70%);
+    animation: wk-login-drift-a 22s ease-in-out infinite alternate;
+}
+
+.wk-login-blob.b {
+    width: 38vw;
+    height: 38vw;
+    right: -8vw;
+    bottom: -12vw;
+    background: radial-gradient(circle at 60% 40%, #FFE0D0, #FFB49A 55%, transparent 70%);
+    animation: wk-login-drift-b 26s ease-in-out infinite alternate;
+}
+
+.wk-login-blob.c {
+    width: 26vw;
+    height: 26vw;
+    right: 22vw;
+    top: 8vh;
+    opacity: .35;
+    background: radial-gradient(circle, #f0abfc, transparent 68%);
+    animation: wk-login-drift-c 18s ease-in-out infinite alternate;
+}
+
+.wk-login-grid {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(124, 58, 237, .16) 1px, transparent 1px);
+    background-size: 28px 28px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 20%, transparent 75%);
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 20%, transparent 75%);
+}
+
+.wk-login-spotlight {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(520px circle at calc(var(--mx) * 100%) calc(var(--my) * 100%), rgba(167, 139, 250, .2), transparent 60%);
+}
+
+/* ---------------- 顶部品牌 / 页脚 ---------------- */
+
+.wk-login-brand {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 28px 40px 0;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    animation: wk-login-fade-down 700ms var(--ease) both;
+}
+
+.wk-login-brand img {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    box-shadow: 0 6px 14px -6px rgba(124, 58, 237, .7);
+}
+
+.wk-login-footer {
+    position: relative;
+    z-index: 2;
+    padding: 0 0 22px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink3);
+}
+
+/* ---------------- 主体布局 ---------------- */
+
+.wk-login-main {
+    position: relative;
+    z-index: 1;
+    min-height: calc(100% - 120px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(48px, 7vw, 120px);
+    padding: 48px 40px;
+    transition: opacity 500ms ease 450ms, filter 500ms ease 450ms;
+}
+
+.wk-login-success .wk-login-main {
+    opacity: 0;
+    filter: blur(6px);
+}
+
+/* ---------------- 左侧展示 ---------------- */
+
+.wk-login-hero {
+    flex: 0 1 560px;
+    min-width: 0;
+}
+
+.wk-login-headline {
+    margin: 0;
+    font-size: clamp(40px, 4.4vw, 62px);
+    line-height: 1.12;
+    font-weight: 700;
+    letter-spacing: -.03em;
+    color: var(--ink);
+}
+
+.wk-login-char,
+.wk-login-headline-accent {
+    display: inline-block;
+    white-space: pre;
+    animation: wk-login-char-in 800ms var(--spring) both;
+    animation-delay: calc(var(--i) * 45ms + 200ms);
+}
+
+.wk-login-headline-accent {
+    background: linear-gradient(90deg, #7c3aed, #c084fc, #FF9A80, #7c3aed);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    padding-right: .05em;
+    animation: wk-login-char-in 900ms var(--spring) both, wk-login-shimmer 6s linear infinite;
+    animation-delay: calc(var(--i) * 45ms + 260ms), 1.4s;
+}
+
+.wk-login-tagline {
+    margin: 18px 0 0;
+    font-size: 17px;
+    color: var(--ink2);
+    animation: wk-login-fade-up 800ms var(--ease) 900ms both;
+}
+
+.wk-login-stage {
+    position: relative;
+    margin-top: 40px;
+    width: 340px;
+    animation: wk-login-fade-up 900ms var(--ease) 1.05s both;
+}
+
+.wk-login-stage-parallax {
+    transform: perspective(1200px) translate3d(calc((var(--mx) - .5) * -16px), calc((var(--my) - .5) * -12px), 0) rotateY(calc((var(--mx) - .5) * 6deg)) rotateX(calc((var(--my) - .5) * -4deg));
+    transition: transform 400ms ease-out;
+}
+
+.wk-login-chip {
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 13px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--p600);
+    background: rgba(255, 255, 255, .8);
+    border: 1px solid rgba(124, 58, 237, .12);
+    box-shadow: 0 10px 24px -12px rgba(76, 29, 149, .35);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    translate: calc((var(--mx) - .5) * 36px) calc((var(--my) - .5) * 28px);
+    transition: translate 500ms ease-out;
+}
+
+.wk-login-chip.a { right: -86px; top: 40px; animation: wk-login-float 6s ease-in-out infinite; }
+.wk-login-chip.b { right: -110px; top: 190px; animation: wk-login-float 7s ease-in-out 1.2s infinite; }
+.wk-login-chip.c { left: -64px; bottom: 70px; animation: wk-login-float 6.5s ease-in-out .6s infinite; }
+
+/* ---------------- 卡片 ---------------- */
+
+.wk-login-card {
+    position: relative;
+    flex: 0 0 400px;
+    width: 400px;
+    margin-top: 40px;
+    transform: perspective(1400px) rotateX(calc((var(--my) - .5) * -3deg)) rotateY(calc((var(--mx) - .5) * 4deg));
+    transition: transform 400ms ease-out;
+    animation: wk-login-card-in 900ms var(--spring) 350ms both;
+}
+
+/* 旋转的渐变描边 */
+.wk-login-card::before {
+    content: "";
+    position: absolute;
+    inset: -1.5px;
+    border-radius: 29.5px;
+    padding: 1.5px;
+    background: conic-gradient(from var(--wk-login-angle), rgba(124, 58, 237, .05), #a78bfa, #FF9A80, rgba(124, 58, 237, .05) 40%, rgba(124, 58, 237, .05));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: wk-login-spin 6s linear infinite;
+}
+
+.wk-login-card-inner {
+    position: relative;
+    padding: 58px 36px 30px;
+    border-radius: 28px;
+    /* 不用 backdrop-filter：Safari 等在 3D 变换下会把毛玻璃层画到桃子上方，导致桃子下半截发白透明 */
+    background: #fff;
+    box-shadow: 0 40px 80px -32px rgba(76, 29, 149, .38);
+}
+
+.wk-login-card-mascot {
+    position: absolute !important;
+    z-index: 3;
+    top: -46px;
+    left: calc(50% - 42px);
+}
+
+.wk-login-card.shake-0 { animation: wk-login-shake-0 520ms ease both; }
+.wk-login-card.shake-1 { animation: wk-login-shake-1 520ms ease both; }
+
+.wk-login-card.success {
+    animation: wk-login-card-out 900ms var(--spring) both;
+}
+
+/* Tabs */
+.wk-login-tabs {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 4px;
+    margin-bottom: 26px;
+    border-radius: 14px;
+    background: #f1eefb;
+}
+
+.wk-login-tabs button {
+    position: relative;
+    z-index: 1;
+    height: 38px;
+    border: 0;
+    background: none;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink3);
+    transition: color 250ms ease;
+}
+
+.wk-login-tabs button[aria-selected="true"] {
+    color: var(--p600);
+}
+
+.wk-login-tabs-indicator {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: calc(50% - 4px);
+    border-radius: 11px;
+    background: #fff;
+    box-shadow: 0 4px 12px -4px rgba(76, 29, 149, .25);
+    transition: translate 450ms var(--spring);
+}
+
+.wk-login-tabs.right .wk-login-tabs-indicator {
+    translate: 100% 0;
+}
+
+.wk-login-subheader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 46px;
+    margin-bottom: 18px;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.wk-login-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 10px;
+    color: var(--ink2);
+    background: #f1eefb;
+    transition: background 200ms ease, translate 200ms ease;
+}
+
+.wk-login-back:hover {
+    background: #e7e1fb;
+    translate: -2px 0;
+}
+
+/* 表单面板切换 */
+.wk-login-panel {
+    animation: wk-login-panel-in 420ms var(--ease) both;
+}
+
+.wk-login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.wk-login-form > * {
+    animation: wk-login-fade-up 480ms var(--ease) both;
+}
+
+.wk-login-form > *:nth-child(1) { animation-delay: 40ms; }
+.wk-login-form > *:nth-child(2) { animation-delay: 90ms; }
+.wk-login-form > *:nth-child(3) { animation-delay: 140ms; }
+.wk-login-form > *:nth-child(4) { animation-delay: 190ms; }
+.wk-login-form > *:nth-child(5) { animation-delay: 240ms; }
+.wk-login-form > *:nth-child(6) { animation-delay: 290ms; }
+
+.wk-login-hint {
+    margin: -6px 0 2px;
+    font-size: 13px;
+    color: var(--ink3);
+}
+
+/* 输入框：浮动标签 */
+.wk-login-field {
+    position: relative;
+    height: 56px;
+    border-radius: 14px;
+    border: 1.5px solid #e7e3f6;
+    background: #fbfaff;
+    transition: border-color 200ms ease, box-shadow 250ms ease, background 200ms ease;
+}
+
+.wk-login-field:hover {
+    border-color: #d8d0f6;
+}
+
+.wk-login-field:focus-within {
+    border-color: var(--p400);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(167, 139, 250, .2);
+}
+
+.wk-login-field-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    translate: 0 -50%;
+    display: flex;
+    color: var(--ink3);
+    transition: color 200ms ease, scale 300ms var(--spring);
+}
+
+.wk-login-field:focus-within .wk-login-field-icon {
+    color: var(--p600);
+    scale: 1.12;
+}
+
+.wk-login-field input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    padding: 18px 16px 0 46px;
+    border: 0;
+    outline: 0;
+    border-radius: 14px;
+    background: transparent;
+    font-family: inherit;
+    font-size: 16px;
+    color: var(--ink);
+}
+
+.wk-login-field label {
+    position: absolute;
+    left: 46px;
+    top: 50%;
+    translate: 0 -50%;
+    font-size: 15px;
+    color: var(--ink3);
+    pointer-events: none;
+    transform-origin: left center;
+    transition: top 220ms var(--ease), scale 220ms var(--ease), color 200ms ease;
+}
+
+.wk-login-field input:focus + label,
+.wk-login-field input:not(:placeholder-shown) + label {
+    top: 17px;
+    scale: .78;
+    color: var(--p600);
+}
+
+/* 手机号：区号选择（原生 select 透明覆盖在区号文字上） */
+.wk-login-zone-label {
+    position: absolute;
+    left: 46px;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    padding-top: 18px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ink);
+    pointer-events: none;
+}
+
+.wk-login-zone-label::after {
+    content: "";
+    width: 1px;
+    height: 16px;
+    margin-left: 10px;
+    background: #ddd7f0;
+}
+
+.wk-login-zone {
+    position: absolute;
+    z-index: 1;
+    left: 40px;
+    top: 0;
+    bottom: 0;
+    width: 58px;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.wk-login-field .wk-login-zone ~ input {
+    padding-left: 106px;
+}
+
+/* 手机号框始终显示区号，标签常驻上方 */
+.wk-login-field .wk-login-zone ~ label {
+    top: 17px;
+    scale: .78;
+}
+
+.wk-login-field-action {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    translate: 0 -50%;
+    display: flex;
+    padding: 6px;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: var(--ink3);
+    transition: color 200ms ease, background 200ms ease;
+}
+
+.wk-login-field-action:hover {
+    color: var(--p600);
+    background: rgba(124, 58, 237, .08);
+}
+
+.wk-login-code-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    translate: 0 -50%;
+    height: 38px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--p600);
+    background: rgba(124, 58, 237, .09);
+    font-variant-numeric: tabular-nums;
+    transition: background 200ms ease, color 200ms ease, scale 200ms var(--spring);
+}
+
+.wk-login-code-btn:hover:not(:disabled) {
+    background: rgba(124, 58, 237, .16);
+}
+
+.wk-login-code-btn:active:not(:disabled) {
+    scale: .95;
+}
+
+.wk-login-code-btn:disabled {
+    color: var(--ink3);
+    background: #f1eefb;
+    cursor: default;
+}
+
+.wk-login-field:has(.wk-login-code-btn) input {
+    padding-right: 120px;
+}
+
+.wk-login-field:has(.wk-login-field-action) input {
+    padding-right: 48px;
+}
+
+.wk-login-row {
+    display: flex;
+    justify-content: flex-end;
+    margin: -4px 0 -2px;
+}
+
+.wk-login-link {
+    border: 0;
+    padding: 2px 0;
+    background: none;
+    font-size: 13px;
+    color: var(--ink2);
+    background-image: linear-gradient(var(--p600), var(--p600));
+    background-size: 0 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: color 200ms ease, background-size 300ms var(--ease);
+}
+
+.wk-login-link:hover {
+    color: var(--p600);
+    background-size: 100% 1px;
+}
+
+/* 主按钮：渐变 + 周期性扫光 + 按压回弹 */
+.wk-login-submit {
+    position: relative;
+    height: 54px;
+    margin-top: 4px;
+    border: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    color: #fff;
+    background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 35%, #a78bfa 100%);
+    background-size: 160% 100%;
+    background-position: 0 0;
+    box-shadow: 0 14px 28px -12px rgba(124, 58, 237, .75);
+    transition: background-position 500ms var(--ease), box-shadow 300ms ease, translate 200ms ease, scale 200ms var(--spring);
+}
+
+.wk-login-submit::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, .35) 50%, transparent 65%);
+    translate: -100% 0;
+    animation: wk-login-sweep 3.2s ease-in-out 2s infinite;
+}
+
+.wk-login-submit:hover:not(:disabled) {
+    background-position: 100% 0;
+    translate: 0 -1px;
+    box-shadow: 0 18px 32px -12px rgba(124, 58, 237, .85);
+}
+
+.wk-login-submit:active:not(:disabled) {
+    scale: .98;
+    translate: 0 0;
+}
+
+.wk-login-submit:disabled {
+    cursor: default;
+}
+
+.wk-login-submit-text {
+    display: inline-block;
+    transition: opacity 200ms ease, translate 300ms var(--ease);
+}
+
+.wk-login-submit-dots {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    opacity: 0;
+    transition: opacity 200ms ease;
+}
+
+.wk-login-submit-dots i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #fff;
+}
+
+.wk-login-submit.loading .wk-login-submit-text {
+    opacity: 0;
+    translate: 0 -10px;
+}
+
+.wk-login-submit.loading .wk-login-submit-dots {
+    opacity: 1;
+}
+
+.wk-login-submit.loading .wk-login-submit-dots i {
+    animation: wk-login-dot 900ms ease-in-out infinite;
+}
+
+.wk-login-submit.loading .wk-login-submit-dots i:nth-child(2) { animation-delay: 120ms; }
+.wk-login-submit.loading .wk-login-submit-dots i:nth-child(3) { animation-delay: 240ms; }
+
+.wk-login-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--ink3);
+}
+
+.wk-login-divider::before,
+.wk-login-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e3def3, transparent);
+}
+
+.wk-login-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 48px;
+    border: 1.5px solid #e7e3f6;
+    border-radius: 14px;
+    background: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink2);
+    transition: border-color 200ms ease, color 200ms ease, background 200ms ease;
+}
+
+.wk-login-secondary:hover {
+    border-color: var(--p300);
+    color: var(--p600);
+    background: #faf8ff;
+}
+
+/* 扫码登录 */
+.wk-login-qrcode {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.wk-login-qrcode-box {
+    position: relative;
+    width: 228px;
+    height: 228px;
+    padding: 16px;
+    border-radius: 22px;
+    overflow: hidden;
+    background: #fff;
+    border: 1.5px solid #ece8f8;
+    box-shadow: 0 16px 32px -20px rgba(76, 29, 149, .4);
+}
+
+.wk-login-qrcode-box canvas {
+    display: block;
+    transition: filter 300ms ease, opacity 300ms ease;
+}
+
+.wk-login-qrcode-box.scanned canvas {
+    filter: blur(4px);
+    opacity: .4;
+}
+
+.wk-login-qrcode-placeholder {
+    width: 196px;
+    height: 196px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #f3f0fc 25%, #ebe5fb 50%, #f3f0fc 75%);
+    background-size: 200% 100%;
+    animation: wk-login-skeleton 1.2s linear infinite;
+}
+
+.wk-login-qrcode-scanline {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    top: 0;
+    height: 46px;
+    background: linear-gradient(180deg, transparent, rgba(167, 139, 250, .28) 85%, rgba(124, 58, 237, .8) 100%);
+    border-bottom: 2px solid rgba(124, 58, 237, .6);
+    animation: wk-login-scan 2.4s var(--ease) infinite;
+    pointer-events: none;
+}
+
+.wk-login-qrcode-box.scanned .wk-login-qrcode-scanline {
+    display: none;
+}
+
+.wk-login-qrcode-avatar {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: wk-login-pop 500ms var(--spring) both;
+}
+
+.wk-login-qrcode-avatar img {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px #fff, 0 10px 24px -8px rgba(76, 29, 149, .5);
+}
+
+.wk-login-qrcode-expire {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 0;
+    font-size: 14px;
+    color: var(--p600);
+    background: rgba(255, 255, 255, .92);
+    backdrop-filter: blur(4px);
+}
+
+.wk-login-qrcode-expire svg {
+    transition: rotate 500ms var(--ease);
+}
+
+.wk-login-qrcode-expire:hover svg {
+    rotate: 180deg;
+}
+
+.wk-login-qrcode-status {
+    margin-top: 18px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.wk-login-qrcode-steps {
+    margin: 12px 0 4px;
+    padding-left: 18px;
+    font-size: 13px;
+    line-height: 1.9;
+    color: var(--ink2);
+}
+
+/* 成功彩纸 */
+.wk-login-confetti {
+    position: absolute;
+    z-index: 4;
+    left: 50%;
+    top: 0;
+    pointer-events: none;
+}
+
+.wk-login-confetti i {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--c);
+    animation: wk-login-confetti 900ms cubic-bezier(.15, .7, .3, 1) both;
+}
+
+.wk-login-confetti i:nth-child(even) {
+    border-radius: 50%;
+}
+
+/* ---------------- 关键帧 ---------------- */
+
+@keyframes wk-login-drift-a {
+    from { translate: 0 0; scale: 1; }
+    to { translate: 8vw 6vh; scale: 1.15; }
+}
+
+@keyframes wk-login-drift-b {
+    from { translate: 0 0; scale: 1.1; }
+    to { translate: -10vw -8vh; scale: .95; }
+}
+
+@keyframes wk-login-drift-c {
+    from { translate: 0 0; }
+    to { translate: -6vw 14vh; }
+}
+
+@keyframes wk-login-char-in {
+    from { opacity: 0; translate: 0 .55em; rotate: 8deg; filter: blur(8px); }
+    to { opacity: 1; translate: 0 0; rotate: 0deg; filter: blur(0); }
+}
+
+@keyframes wk-login-shimmer {
+    to { background-position: 300% 0; }
+}
+
+@keyframes wk-login-fade-up {
+    from { opacity: 0; translate: 0 14px; }
+    to { opacity: 1; translate: 0 0; }
+}
+
+@keyframes wk-login-fade-down {
+    from { opacity: 0; translate: 0 -12px; }
+    to { opacity: 1; translate: 0 0; }
+}
+
+@keyframes wk-login-float {
+    0%, 100% { margin-top: 0; }
+    50% { margin-top: -10px; }
+}
+
+/* 不做透明度变化：卡片上的桃子入场时也保持不透明 */
+@keyframes wk-login-card-in {
+    from { translate: 0 40px; scale: .94; }
+    to { translate: 0 0; scale: 1; }
+}
+
+@keyframes wk-login-card-out {
+    0% { scale: 1; }
+    35% { scale: 1.03; }
+    100% { scale: .9; opacity: 0; translate: 0 -20px; }
+}
+
+@keyframes wk-login-spin {
+    to { --wk-login-angle: 360deg; }
+}
+
+@keyframes wk-login-panel-in {
+    from { opacity: 0; translate: 0 10px; filter: blur(4px); }
+    to { opacity: 1; translate: 0 0; filter: blur(0); }
+}
+
+@keyframes wk-login-shake-0 {
+    0%, 100% { translate: 0 0; }
+    15% { translate: -10px 0; }
+    30% { translate: 9px 0; }
+    45% { translate: -6px 0; }
+    60% { translate: 4px 0; }
+    75% { translate: -2px 0; }
+}
+
+@keyframes wk-login-shake-1 {
+    0%, 100% { translate: 0 0; }
+    15% { translate: -10px 0; }
+    30% { translate: 9px 0; }
+    45% { translate: -6px 0; }
+    60% { translate: 4px 0; }
+    75% { translate: -2px 0; }
+}
+
+@keyframes wk-login-sweep {
+    0% { translate: -100% 0; }
+    40%, 100% { translate: 100% 0; }
+}
+
+@keyframes wk-login-dot {
+    0%, 100% { translate: 0 0; opacity: .5; }
+    40% { translate: 0 -6px; opacity: 1; }
+}
+
+@keyframes wk-login-skeleton {
+    to { background-position: -200% 0; }
+}
+
+@keyframes wk-login-scan {
+    0% { translate: 0 -46px; }
+    100% { translate: 0 228px; }
+}
+
+@keyframes wk-login-pop {
+    from { scale: .4; opacity: 0; }
+    to { scale: 1; opacity: 1; }
+}
+
+@keyframes wk-login-confetti {
+    0% { transform: rotate(var(--a)) translateY(0) scale(1); opacity: 1; }
+    100% { transform: rotate(var(--a)) translateY(calc(var(--d) * -1)) rotate(220deg) scale(.3); opacity: 0; }
+}
+
+/* ---------------- 响应式 ---------------- */
+
+@media (max-width: 1080px) {
+    .wk-login-hero {
+        display: none;
+    }
+
+    .wk-login-brand {
+        justify-content: center;
+        padding: 28px 20px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .wk-login-main {
+        padding: 48px 16px 32px;
+    }
+
+    .wk-login-card {
+        flex-basis: auto;
+        width: 100%;
+        transform: none;
+    }
+
+    .wk-login-card-inner {
+        padding: 56px 20px 24px;
+    }
+
+    .wk-login-blob {
+        filter: blur(50px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wk-login *,
+    .wk-login *::before,
+    .wk-login *::after {
+        animation-duration: 1ms !important;
+        animation-delay: 0ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 1ms !important;
+    }
+
+    .wk-login-stage-parallax,
+    .wk-login-card,
+    .wk-login-blob {
+        transform: none !important;
+    }
+}

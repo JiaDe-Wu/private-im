@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 启动页：品牌浅紫底 + 居中应用图标 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/welcome_bg" />
+    <item android:width="96dp" android:height="96dp" android:gravity="center" android:drawable="@drawable/ps_splash_logo" />
+</layer-list>

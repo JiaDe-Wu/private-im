@@ -1,0 +1,23 @@
+const { chromium } = require('playwright');
+(async () => {
+  const out = process.argv[2];
+  const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
+  const errs = []; p.on('pageerror', (e) => errs.push(e.message));
+  await p.goto('http://127.0.0.1:3000/', { waitUntil: 'networkidle' });
+  await p.fill('input[type=tel]', '13900000004'); await p.fill('input[type=password]', 'test123456'); await p.click('button[type=submit]');
+  await p.waitForSelector('.wk-conversationlist-item'); await p.waitForTimeout(1500);
+  await p.locator('.wk-conversationlist-item', { hasText: '产品经理 Ada' }).first().click(); await p.waitForTimeout(1200);
+  const ta = p.locator('textarea').first(); await ta.click(); await p.keyboard.type('新的输入框和发送按钮怎么样？');
+  await p.waitForTimeout(400);
+  await p.screenshot({ path: `${out}/chat-typing.png`, clip: { x: 360, y: 700, width: 1080, height: 200 } });
+  const before = await p.locator('.wk-message-base-bubble-box.send').count();
+  await p.click('.ps-send.ps-send-ready'); await p.waitForTimeout(1500);
+  const after = await p.locator('.wk-message-base-bubble-box.send').count();
+  console.log('点击发送按钮：发出气泡', before, '→', after, '| 输入框已清空:', (await ta.inputValue()) === '');
+  await p.click('.ps-sider-settings-btn'); await p.click('.ps-sider-menu button:has-text("深色模式")'); await p.keyboard.press('Escape'); await p.waitForTimeout(800);
+  await p.locator('.wk-conversationlist-item', { hasText: /AI-DLC/ }).first().click(); await p.waitForTimeout(1500);
+  await p.screenshot({ path: `${out}/chat-dark.png` });
+  await p.click('.ps-sider-settings-btn'); await p.click('.ps-sider-menu button:has-text("深色模式")');
+  console.log('页面错误:', errs.length ? errs : '无');
+  await b.close();
+})().catch((e) => { console.error('FAIL', e.message); process.exit(1); });

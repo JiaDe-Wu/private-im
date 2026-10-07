@@ -1,0 +1,14 @@
+<svg width="26" height="26" viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg">
+    <title>moments_selected</title>
+    <defs>
+        <linearGradient x1="100%" y1="100%" x2="0%" y2="0%" id="moments-tab-gradient">
+            <stop stop-color="#7c3aed" offset="0%"/>
+            <stop stop-color="#a78bfa" offset="100%"/>
+        </linearGradient>
+    </defs>
+    <circle cx="13" cy="13" r="11" fill="url(#moments-tab-gradient)"/>
+    <g fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".9">
+        <path d="M13 4.5l2.8 6.6M21.5 13l-6.6 2.8M13 21.5l-2.8-6.6M4.5 13l6.6-2.8"/>
+        <circle cx="13" cy="13" r="2.6"/>
+    </g>
+</svg>

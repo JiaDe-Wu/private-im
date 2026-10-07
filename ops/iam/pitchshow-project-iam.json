@@ -1,0 +1,43 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ManageProjectRoles",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole", "iam:DeleteRole", "iam:GetRole", "iam:UpdateRole", "iam:UpdateAssumeRolePolicy",
+        "iam:TagRole", "iam:UntagRole", "iam:ListRoleTags",
+        "iam:PutRolePolicy", "iam:DeleteRolePolicy", "iam:GetRolePolicy", "iam:ListRolePolicies",
+        "iam:AttachRolePolicy", "iam:DetachRolePolicy", "iam:ListAttachedRolePolicies",
+        "iam:PutRolePermissionsBoundary", "iam:DeleteRolePermissionsBoundary",
+        "iam:PassRole"
+      ],
+      "Resource": [
+        "arn:aws:iam::000000000000:role/pitchshow-*",
+        "arn:aws:iam::000000000000:role/PitchShow*",
+        "arn:aws:iam::000000000000:role/cdk-*"
+      ]
+    },
+    {
+      "Sid": "ManageProjectPolicies",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreatePolicy", "iam:DeletePolicy", "iam:GetPolicy", "iam:TagPolicy", "iam:UntagPolicy",
+        "iam:CreatePolicyVersion", "iam:DeletePolicyVersion", "iam:GetPolicyVersion", "iam:ListPolicyVersions"
+      ],
+      "Resource": [
+        "arn:aws:iam::000000000000:policy/pitchshow-*",
+        "arn:aws:iam::000000000000:policy/PitchShow*"
+      ]
+    },
+    {
+      "Sid": "ServiceLinkedRolesAndRead",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateServiceLinkedRole", "iam:DeleteServiceLinkedRole", "iam:GetServiceLinkedRoleDeletionStatus",
+        "iam:ListRoles", "iam:ListPolicies", "iam:GetAccountSummary"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

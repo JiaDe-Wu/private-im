@@ -1,0 +1,235 @@
+.wk-showcase {
+    width: 340px;
+    border-radius: 24px;
+    /* 不用 backdrop-filter：外层有 3D 视差变换，部分浏览器会让毛玻璃盖住里面的桃子贴纸 */
+    background: #fbfaff;
+    border: 1px solid #fff;
+    box-shadow: 0 30px 60px -20px rgba(76, 29, 149, .25), 0 0 0 1px rgba(124, 58, 237, .06);
+    overflow: hidden;
+}
+
+.wk-showcase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(124, 58, 237, .08);
+}
+
+.wk-showcase-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 600;
+    background: linear-gradient(135deg, #f472b6, #fb923c);
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(34, 197, 94, .5);
+}
+
+.wk-showcase-name {
+    font-weight: 600;
+    font-size: 15px;
+    color: #0d0d1a;
+}
+
+.wk-showcase-status {
+    font-size: 12px;
+    color: #22a35a;
+    transition: color 200ms ease;
+}
+
+.wk-showcase-status.typing {
+    color: #7c3aed;
+}
+
+.wk-showcase-body {
+    height: 360px;
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.wk-showcase-row {
+    display: flex;
+    animation: wk-showcase-in 420ms cubic-bezier(.34, 1.56, .64, 1) both;
+}
+
+/* 桃子贴纸只弹出、不淡入，保证全程不透明 */
+.wk-showcase-row.sticker {
+    animation-name: wk-showcase-pop;
+}
+
+.wk-showcase-row.me {
+    justify-content: flex-end;
+}
+
+.wk-showcase-row.me .wk-showcase-bubble {
+    transform-origin: bottom right;
+}
+
+.wk-showcase-row.them .wk-showcase-bubble {
+    transform-origin: bottom left;
+}
+
+.wk-showcase-bubble {
+    position: relative;
+    max-width: 78%;
+    padding: 9px 13px 18px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #0d0d1a;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(13, 13, 26, .06);
+}
+
+.wk-showcase-row.me .wk-showcase-bubble {
+    color: #fff;
+    background: linear-gradient(135deg, #7c3aed, #9b6cf6);
+    border-bottom-right-radius: 6px;
+    box-shadow: 0 6px 16px -6px rgba(124, 58, 237, .6);
+}
+
+.wk-showcase-row.them .wk-showcase-bubble {
+    border-bottom-left-radius: 6px;
+}
+
+.wk-showcase-time {
+    position: absolute;
+    right: 11px;
+    bottom: 4px;
+    font-size: 10px;
+    opacity: .55;
+    white-space: nowrap;
+}
+
+.wk-showcase-bubble.sticker {
+    padding: 0;
+    background: none;
+    box-shadow: none;
+}
+
+.wk-showcase-bubble.typing {
+    display: flex;
+    gap: 4px;
+    padding: 13px 14px;
+}
+
+.wk-showcase-bubble.typing i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #a78bfa;
+    animation: wk-showcase-dot 1s ease-in-out infinite;
+}
+
+.wk-showcase-bubble.typing i:nth-child(2) { animation-delay: .15s; }
+.wk-showcase-bubble.typing i:nth-child(3) { animation-delay: .3s; }
+
+/* 图片消息：一页迷你幻灯片 */
+.wk-showcase-bubble.slide {
+    padding: 5px 5px 20px;
+}
+
+.wk-showcase-slide-canvas {
+    position: relative;
+    width: 190px;
+    height: 108px;
+    border-radius: 13px;
+    padding: 14px;
+    overflow: hidden;
+    background: radial-gradient(120% 90% at 0% 0%, #2d1060 0%, #0d0d16 70%);
+}
+
+.wk-showcase-slide-canvas::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, .18) 50%, transparent 70%);
+    transform: translateX(-100%);
+    animation: wk-showcase-shine 2.6s ease-in-out 400ms infinite;
+}
+
+.wk-showcase-slide-title,
+.wk-showcase-slide-line {
+    display: block;
+    height: 8px;
+    border-radius: 4px;
+    margin-bottom: 7px;
+    background: rgba(255, 255, 255, .85);
+    width: 58%;
+}
+
+.wk-showcase-slide-line {
+    height: 5px;
+    width: 42%;
+    background: rgba(196, 181, 253, .55);
+}
+
+.wk-showcase-slide-line.short {
+    width: 28%;
+}
+
+.wk-showcase-slide-bars {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    height: 56px;
+}
+
+.wk-showcase-slide-bars i {
+    width: 10px;
+    border-radius: 3px 3px 0 0;
+    background: linear-gradient(180deg, #c4b5fd, #7c3aed);
+    transform-origin: bottom;
+    animation: wk-showcase-bar 900ms cubic-bezier(.34, 1.56, .64, 1) both;
+}
+
+.wk-showcase-slide-bars i:nth-child(2) { animation-delay: 90ms; }
+.wk-showcase-slide-bars i:nth-child(3) { animation-delay: 180ms; }
+.wk-showcase-slide-bars i:nth-child(4) { animation-delay: 270ms; background: linear-gradient(180deg, #FFCDB0, #FF8B70); }
+
+.wk-showcase-slide-meta {
+    padding: 6px 4px 0;
+    font-size: 12px;
+    opacity: .9;
+}
+
+@keyframes wk-showcase-in {
+    from { opacity: 0; transform: translateY(14px) scale(.85); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes wk-showcase-pop {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+}
+
+@keyframes wk-showcase-dot {
+    0%, 60%, 100% { transform: translateY(0); opacity: .5; }
+    30% { transform: translateY(-4px); opacity: 1; }
+}
+
+@keyframes wk-showcase-shine {
+    0% { transform: translateX(-100%); }
+    60%, 100% { transform: translateX(100%); }
+}
+
+@keyframes wk-showcase-bar {
+    from { transform: scaleY(0); }
+    to { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wk-showcase *, .wk-showcase *::after {
+        animation: none !important;
+    }
+}

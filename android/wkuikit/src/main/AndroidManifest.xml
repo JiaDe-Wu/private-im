@@ -1,0 +1,78 @@
+<manifest xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <application>
+
+        <activity android:name=".group.DeleteGroupMemberActivity" />
+        <activity
+            android:name=".group.GroupNoticeActivity"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".group.GroupDetailActivity" />
+        <activity android:name=".group.SavedGroupsActivity" />
+        <activity android:name=".group.UpdateGroupNameActivity" />
+        <activity
+            android:name=".chat.ChooseChatActivity"
+            android:windowSoftInputMode="adjustPan|stateHidden" />
+        <activity android:name=".search.SearchUserActivity" />
+        <activity android:name=".chat.ChatPersonalActivity" />
+        <activity
+            android:name=".contacts.ChooseContactsActivity"
+            android:windowSoftInputMode="adjustPan|stateHidden" />
+
+        <activity android:name=".contacts.NewFriendsActivity" />
+        <activity android:name=".setting.SettingActivity" />
+        <activity android:name=".group.GroupQrActivity" />
+        <activity android:name=".search.SearchAllActivity" />
+        <activity android:name=".user.MyInfoActivity" />
+        <activity android:name=".user.UserQrActivity" />
+        <activity android:name=".user.MyHeadPortraitActivity" />
+        <activity android:name=".setting.MsgNoticesSettingActivity" />
+        <activity
+            android:name=".user.UserDetailActivity"
+            android:launchMode="singleTask" />
+        <activity android:name=".user.UpdateUserInfoActivity" />
+        <activity android:name=".user.SetUserRemarkActivity" />
+        <activity android:name=".search.AddFriendsActivity" />
+        <activity android:name=".chat.PreviewNewImgActivity" />
+        <activity android:name=".search.SearchMsgResultActivity" />
+        <activity android:name=".chat.ChatMultiForwardDetailActivity" />
+        <activity android:name=".setting.WKThemeSettingActivity" />
+        <activity android:name=".setting.WKLanguageActivity" />
+        <activity android:name=".group.WKAllMembersActivity" />
+        <activity android:name=".user.WKFileHelperActivity" />
+        <activity android:name=".user.WKSystemTeamActivity" />
+        <activity android:name=".group.WKSetGroupRemarkActivity" />
+        <activity android:name=".setting.WKSetFontSizeActivity" />
+        <activity
+            android:name=".group.ChooseVideoCallMembersActivity"
+            android:windowSoftInputMode="adjustPan|stateHidden" />
+        <activity android:name=".setting.WKAboutActivity" />
+
+        <activity android:name=".search.MailListActivity" />
+        <activity android:name=".message.BackupRestoreMessageActivity" />
+        <activity android:name=".setting.AppModulesActivity" />
+        <activity android:name=".setting.ErrorLogsActivity" />
+        <activity
+            android:name="com.chat.uikit.TabActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan"
+            android:launchMode="singleTask"/>
+        <activity android:name="com.chat.uikit.chat.ChatActivity"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
+        <activity android:name="com.chat.uikit.search.remote.GlobalActivity" />
+        <activity android:name="com.chat.uikit.chat.search.MessageRecordActivity" />
+        <activity android:name="com.chat.uikit.chat.search.member.SearchWithMemberActivity" />
+        <activity android:name="com.chat.uikit.chat.search.date.SearchWithDateActivity" />
+        <activity android:name="com.chat.uikit.chat.search.image.SearchWithImgActivity" />
+
+        <service
+            android:name="com.chat.uikit.AliveJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+    </application>
+</manifest>

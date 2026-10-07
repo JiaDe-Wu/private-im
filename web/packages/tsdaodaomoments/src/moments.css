@@ -1,0 +1,1019 @@
+/* 朋友圈（PitchShow 紫色主题，跟随 --wk-color-theme） */
+
+.wk-moments-sidebar,
+.wk-moments-main {
+    --m-ink: #1a1a2e;
+    --m-ink2: #5b5b7a;
+    --m-ink3: #9a9ab5;
+    --m-line: #eeebf8;
+    --m-soft: #f6f4fd;
+    --m-card: #fff;
+    --m-name: var(--wk-color-theme, #7c3aed);
+}
+
+body[theme-mode=dark] .wk-moments-sidebar,
+body[theme-mode=dark] .wk-moments-main {
+    --m-ink: #ececf5;
+    --m-ink2: #b5b5cc;
+    --m-ink3: #7d7d98;
+    --m-line: #2a2a3c;
+    --m-soft: #1f1f2e;
+    --m-card: #17171f;
+    --m-name: #b9a3ff;
+}
+
+/* ---------- 左侧栏 ---------- */
+
+.wk-moments-sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: var(--m-ink);
+}
+
+.wk-moments-sidebar-header {
+    height: var(--wk-height-chat-search, 64px);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.wk-moments-sidebar ul {
+    list-style: none;
+    margin: 0;
+    padding: 4px 10px;
+}
+
+.wk-moments-sidebar li {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    margin-bottom: 4px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 180ms ease;
+}
+
+.wk-moments-sidebar li:hover {
+    background: var(--m-soft);
+}
+
+.wk-moments-sidebar li.selected {
+    background: var(--wk-color-theme, #7c3aed);
+    color: #fff;
+}
+
+.wk-moments-sidebar-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    color: var(--wk-color-theme, #7c3aed);
+    background: rgba(124, 58, 237, .1);
+}
+
+.wk-moments-sidebar li.selected .wk-moments-sidebar-icon {
+    color: #fff;
+    background: rgba(255, 255, 255, .2);
+}
+
+.wk-moments-sidebar-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.wk-moments-sidebar-text b {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.wk-moments-sidebar-text small {
+    font-size: 12px;
+    color: var(--m-ink3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.wk-moments-sidebar li.selected small {
+    color: rgba(255, 255, 255, .75);
+}
+
+.wk-moments-sidebar-dot {
+    position: relative;
+    margin-left: auto;
+    width: 28px;
+    height: 28px;
+}
+
+.wk-moments-sidebar-dot img {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+}
+
+.wk-moments-sidebar-dot::after {
+    content: "";
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #f5455c;
+    box-shadow: 0 0 0 2px var(--m-card);
+}
+
+.wk-moments-sidebar-badge {
+    margin-left: auto;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    color: #fff;
+    background: #f5455c;
+}
+
+.wk-moments-sidebar-publish {
+    margin: 12px 20px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 0;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    background: linear-gradient(135deg, #6d28d9, #7c3aed 40%, #a78bfa);
+    box-shadow: 0 10px 20px -10px rgba(124, 58, 237, .8);
+    transition: translate 200ms ease, box-shadow 200ms ease;
+}
+
+.wk-moments-sidebar-publish:hover {
+    translate: 0 -1px;
+    box-shadow: 0 14px 24px -10px rgba(124, 58, 237, .9);
+}
+
+/* ---------- 右侧主体 ---------- */
+
+.wk-moments-main {
+    position: relative;
+    height: 100%;
+    background: var(--m-card);
+    color: var(--m-ink);
+}
+
+.wk-moments-main-scroll {
+    height: 100%;
+    overflow-y: auto;
+    animation: wk-moments-fade 260ms ease both;
+}
+
+.wk-moments-floatback,
+.wk-moments-back {
+    border: 0;
+    cursor: pointer;
+    background: none;
+    color: inherit;
+}
+
+.wk-moments-floatback {
+    position: absolute;
+    z-index: 3;
+    top: 16px;
+    left: 16px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 14px;
+    color: #fff;
+    background: rgba(13, 13, 26, .35);
+    backdrop-filter: blur(6px);
+}
+
+.wk-moments-feed,
+.wk-moments-panel {
+    max-width: 680px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+}
+
+/* 封面 */
+.wk-moments-cover {
+    position: relative;
+    height: 300px;
+    margin-bottom: 56px;
+    background: radial-gradient(120% 120% at 0% 0%, #c4b5fd 0%, #8b5cf6 45%, #ff9a80 120%);
+    background-size: cover;
+    background-position: center;
+}
+
+.wk-moments-cover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 55%, rgba(13, 13, 26, .35));
+    pointer-events: none;
+}
+
+.wk-moments-cover-change,
+.wk-moments-camera {
+    position: absolute;
+    z-index: 1;
+    top: 16px;
+    border: 0;
+    cursor: pointer;
+    color: #fff;
+    background: rgba(13, 13, 26, .3);
+    backdrop-filter: blur(6px);
+    transition: background 200ms ease;
+}
+
+.wk-moments-cover-change {
+    left: 16px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    opacity: 0;
+}
+
+.wk-moments-cover:hover .wk-moments-cover-change {
+    opacity: 1;
+}
+
+.wk-moments-camera {
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wk-moments-camera:hover,
+.wk-moments-cover-change:hover {
+    background: rgba(124, 58, 237, .7);
+}
+
+.wk-moments-owner {
+    position: absolute;
+    z-index: 1;
+    right: 24px;
+    bottom: -36px;
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    cursor: pointer;
+}
+
+.wk-moments-owner span {
+    margin-bottom: 44px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, .35);
+}
+
+.wk-moments-owner img {
+    width: 76px;
+    height: 76px;
+    border-radius: 16px;
+    border: 3px solid var(--m-card);
+    background: var(--m-card);
+    box-shadow: 0 10px 24px -10px rgba(76, 29, 149, .5);
+}
+
+.wk-moments-newbanner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: -28px auto 12px;
+    padding: 6px 16px 6px 6px;
+    border: 0;
+    border-radius: 999px;
+    font-size: 13px;
+    color: #fff;
+    cursor: pointer;
+    background: #2a2a3c;
+    animation: wk-moments-pop 360ms cubic-bezier(.34, 1.56, .64, 1) both;
+}
+
+.wk-moments-newbanner img {
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+}
+
+/* ---------- 单条动态 ---------- */
+
+.wk-moments-list {
+    padding: 0 24px;
+}
+
+.wk-moment {
+    display: flex;
+    gap: 12px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--m-line);
+    animation: wk-moments-fade 320ms ease both;
+}
+
+.wk-moment-avatar {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.wk-moment-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.wk-moment-name {
+    display: inline-block;
+    margin-bottom: 4px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--m-name);
+    cursor: pointer;
+}
+
+.wk-moment-text {
+    font-size: 15px;
+    line-height: 22px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.wk-moment-text.collapsed {
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.wk-moment-more {
+    padding: 0;
+    margin-top: 2px;
+    border: 0;
+    background: none;
+    font-size: 14px;
+    color: var(--m-name);
+    cursor: pointer;
+}
+
+/* 九宫格 */
+.wk-moment-grid {
+    display: grid;
+    gap: 5px;
+    margin-top: 10px;
+    max-width: 330px;
+}
+
+.wk-moment-grid.cols-1 { display: block; }
+.wk-moment-grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 222px; }
+.wk-moment-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.wk-moment-cell {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 6px;
+    cursor: zoom-in;
+    background: var(--m-soft);
+}
+
+/* 盖在图片上的细边框，白底图片也有边界 */
+.wk-moment-cell::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px rgba(13, 13, 26, .07);
+    pointer-events: none;
+}
+
+.wk-moment-grid.cols-1 .wk-moment-cell {
+    aspect-ratio: auto;
+}
+
+.wk-moment-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: scale 400ms ease;
+}
+
+.wk-moment-cell:hover img {
+    scale: 1.04;
+}
+
+.wk-moment-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--m-ink3);
+}
+
+.wk-moment-private {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.wk-moment-delete {
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: 12px;
+    color: var(--m-name);
+    cursor: pointer;
+}
+
+/* 赞/评论菜单 */
+.wk-moment-actions {
+    position: relative;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+}
+
+.wk-moment-actions-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 34px;
+    height: 22px;
+    border: 0;
+    border-radius: 5px;
+    cursor: pointer;
+    background: var(--m-soft);
+    transition: background 180ms ease;
+}
+
+.wk-moment-actions-toggle:hover {
+    background: rgba(124, 58, 237, .14);
+}
+
+.wk-moment-actions-toggle span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--m-name);
+}
+
+.wk-moment-actions-menu {
+    position: absolute;
+    right: 42px;
+    top: 50%;
+    display: flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background: #2a2a3c;
+    transform-origin: right center;
+    translate: 0 -50%;
+    scale: 0 1;
+    opacity: 0;
+    pointer-events: none;
+    transition: scale 220ms cubic-bezier(.34, 1.56, .64, 1), opacity 160ms ease;
+}
+
+.wk-moment-actions-menu.open {
+    scale: 1 1;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.wk-moment-actions-menu button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 36px;
+    padding: 0 14px;
+    border: 0;
+    background: none;
+    color: #fff;
+    font-size: 13px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.wk-moment-actions-menu button:hover {
+    color: #c4b5fd;
+}
+
+.wk-moment-actions-menu i {
+    width: 1px;
+    height: 18px;
+    background: rgba(255, 255, 255, .15);
+}
+
+/* 赞与评论区 */
+.wk-moment-social {
+    position: relative;
+    margin-top: 10px;
+    border-radius: 6px;
+    background: var(--m-soft);
+    font-size: 14px;
+    line-height: 21px;
+}
+
+.wk-moment-social::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: 14px;
+    border: 6px solid transparent;
+    border-top: 0;
+    border-bottom-color: var(--m-soft);
+}
+
+.wk-moment-likes {
+    padding: 7px 10px;
+}
+
+.wk-moment-likes-icon {
+    display: inline-flex;
+    vertical-align: -2px;
+    margin-right: 6px;
+    color: #f5455c;
+}
+
+.wk-moment-likes-icon.burst {
+    animation: wk-moments-heart 520ms cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.wk-moment-user {
+    color: var(--m-name);
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.wk-moment-comments {
+    list-style: none;
+    margin: 0;
+    padding: 6px 0;
+}
+
+.wk-moment-comments.divided {
+    border-top: 1px solid var(--m-line);
+}
+
+.wk-moment-comments li {
+    position: relative;
+    padding: 2px 30px 2px 10px;
+    word-break: break-word;
+    cursor: pointer;
+    transition: background 150ms ease;
+}
+
+.wk-moment-comments li:hover {
+    background: rgba(124, 58, 237, .07);
+}
+
+.wk-moment-reply-word {
+    margin: 0 4px;
+    color: var(--m-ink2);
+}
+
+.wk-moment-comment-delete {
+    position: absolute;
+    right: 6px;
+    top: 2px;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--m-ink3);
+    font-size: 15px;
+    line-height: 20px;
+    cursor: pointer;
+    opacity: 0;
+}
+
+.wk-moment-comments li:hover .wk-moment-comment-delete {
+    opacity: 1;
+}
+
+.wk-moment-comment-delete:hover {
+    color: #f5455c;
+    background: rgba(245, 69, 92, .1);
+}
+
+.wk-moment-reply {
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    border-top: 1px solid var(--m-line);
+    animation: wk-moments-fade 200ms ease both;
+}
+
+.wk-moment-reply input {
+    flex: 1;
+    min-width: 0;
+    height: 34px;
+    padding: 0 12px;
+    border: 1.5px solid var(--m-line);
+    border-radius: 9px;
+    outline: 0;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--m-ink);
+    background: var(--m-card);
+    transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.wk-moment-reply input:focus {
+    border-color: #a78bfa;
+    box-shadow: 0 0 0 3px rgba(167, 139, 250, .2);
+}
+
+.wk-moment-reply button {
+    padding: 0 14px;
+    border: 0;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    background: var(--wk-color-theme, #7c3aed);
+}
+
+.wk-moment-reply button:disabled {
+    cursor: default;
+    opacity: .4;
+}
+
+/* ---------- 列表状态 ---------- */
+
+.wk-moments-sentinel {
+    display: flex;
+    justify-content: center;
+    padding: 24px 0;
+    font-size: 12px;
+    color: var(--m-ink3);
+}
+
+.wk-moments-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 0 16px;
+    color: var(--m-ink3);
+}
+
+.wk-moments-empty img {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    animation: wk-moments-float 3.2s ease-in-out infinite;
+}
+
+.wk-moments-empty button {
+    margin-top: 8px;
+    padding: 8px 20px;
+    border: 0;
+    border-radius: 999px;
+    color: #fff;
+    cursor: pointer;
+    background: var(--wk-color-theme, #7c3aed);
+}
+
+/* ---------- 与我相关 / 详情 ---------- */
+
+.wk-moments-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 20px 24px 12px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.wk-moments-back {
+    font-size: 28px;
+    line-height: 1;
+    padding: 0 6px 4px 0;
+}
+
+.wk-moments-notices {
+    list-style: none;
+    margin: 0;
+    padding: 0 24px;
+}
+
+.wk-moments-notices li {
+    display: flex;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--m-line);
+    cursor: pointer;
+    animation: wk-moments-fade 300ms ease both;
+}
+
+.wk-moments-notice-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+}
+
+.wk-moments-notice-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.wk-moments-notice-name {
+    font-weight: 600;
+    color: var(--m-name);
+}
+
+.wk-moments-notice-action {
+    margin: 2px 0;
+    font-size: 14px;
+    word-break: break-word;
+}
+
+.wk-moments-notice-heart {
+    color: #f5455c;
+}
+
+.wk-moments-notice-time {
+    font-size: 12px;
+    color: var(--m-ink3);
+}
+
+.wk-moments-notice-thumb {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 6px;
+    background: var(--m-soft);
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--m-ink2);
+}
+
+.wk-moments-notice-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.wk-moments-notice-thumb span {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    padding: 6px;
+}
+
+.wk-moments-notice-thumb .deleted {
+    color: var(--m-ink3);
+}
+
+/* ---------- 发布弹窗 ---------- */
+
+.wk-moments-composer .semi-modal-content {
+    border-radius: 20px;
+}
+
+.wk-moments-composer-body {
+    position: relative;
+    border-radius: 14px;
+    transition: box-shadow 200ms ease;
+}
+
+.wk-moments-composer-body.dragging {
+    box-shadow: 0 0 0 2px #a78bfa;
+}
+
+.wk-moments-composer-body textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px 14px;
+    border: 1.5px solid #ece8f8;
+    border-radius: 14px;
+    outline: 0;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 22px;
+    background: #fbfaff;
+    transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.wk-moments-composer-body textarea:focus {
+    border-color: #a78bfa;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(167, 139, 250, .18);
+}
+
+.wk-moments-composer-count {
+    margin: 4px 2px 10px;
+    text-align: right;
+    font-size: 12px;
+    color: #9a9ab5;
+}
+
+.wk-moments-composer-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)); /* minmax(0, …) 防止图片原始尺寸撑宽列 */
+    gap: 8px;
+}
+
+.wk-moments-composer-cell,
+.wk-moments-composer-add {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.wk-moments-composer-cell {
+    animation: wk-moments-pop 300ms cubic-bezier(.34, 1.56, .64, 1) both;
+}
+
+.wk-moments-composer-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 300ms ease, filter 300ms ease;
+}
+
+.wk-moments-composer-cell.uploading img {
+    opacity: .5;
+    filter: blur(1px);
+}
+
+.wk-moments-composer-cell.uploading::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 26px;
+    height: 26px;
+    margin: -13px 0 0 -13px;
+    border: 3px solid rgba(255, 255, 255, .6);
+    border-top-color: #7c3aed;
+    border-radius: 50%;
+    animation: wk-moments-spin 800ms linear infinite;
+}
+
+.wk-moments-composer-cell.failed img {
+    opacity: .35;
+}
+
+.wk-moments-composer-tip {
+    position: absolute;
+    inset: auto 0 0;
+    padding: 4px 0;
+    text-align: center;
+    font-size: 12px;
+    color: #fff;
+    background: rgba(245, 69, 92, .85);
+}
+
+.wk-moments-composer-cell button {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    font-size: 16px;
+    line-height: 22px;
+    color: #fff;
+    cursor: pointer;
+    background: rgba(13, 13, 26, .55);
+}
+
+.wk-moments-composer-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px dashed #d8d0f6;
+    color: #a78bfa;
+    cursor: pointer;
+    background: #faf8ff;
+    transition: border-color 180ms ease, color 180ms ease, background 180ms ease;
+}
+
+.wk-moments-composer-add:hover {
+    border-color: #7c3aed;
+    color: #7c3aed;
+    background: #f3effe;
+}
+
+.wk-moments-composer-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.wk-moments-privacy {
+    display: flex;
+    padding: 3px;
+    border-radius: 11px;
+    background: #f1eefb;
+}
+
+.wk-moments-privacy button {
+    height: 32px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 9px;
+    font-size: 13px;
+    color: #8a8aaa;
+    cursor: pointer;
+    background: none;
+    transition: background 200ms ease, color 200ms ease;
+}
+
+.wk-moments-privacy button.on {
+    color: #7c3aed;
+    font-weight: 600;
+    background: #fff;
+    box-shadow: 0 2px 8px -2px rgba(76, 29, 149, .25);
+}
+
+.wk-moments-publish {
+    height: 38px;
+    padding: 0 24px;
+    border: 0;
+    border-radius: 11px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    background: linear-gradient(135deg, #6d28d9, #7c3aed 40%, #a78bfa);
+    box-shadow: 0 8px 18px -8px rgba(124, 58, 237, .8);
+}
+
+.wk-moments-publish:disabled {
+    cursor: default;
+    opacity: .45;
+    box-shadow: none;
+}
+
+/* ---------- 动效 ---------- */
+
+@keyframes wk-moments-fade {
+    from { opacity: 0; translate: 0 8px; }
+    to { opacity: 1; translate: 0 0; }
+}
+
+@keyframes wk-moments-pop {
+    from { scale: .6; opacity: 0; }
+    to { scale: 1; opacity: 1; }
+}
+
+@keyframes wk-moments-heart {
+    0% { scale: 1; }
+    35% { scale: 1.6; }
+    100% { scale: 1; }
+}
+
+@keyframes wk-moments-spin {
+    to { rotate: 360deg; }
+}
+
+@keyframes wk-moments-float {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -6px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wk-moments-main *,
+    .wk-moments-sidebar * {
+        animation: none !important;
+        transition: none !important;
+    }
+}

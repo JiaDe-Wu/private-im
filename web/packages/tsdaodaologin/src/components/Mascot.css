@@ -1,0 +1,70 @@
+.wk-mascot {
+    position: relative;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.wk-mascot svg {
+    display: block;
+    overflow: visible;
+}
+
+.wk-mascot-body {
+    transform-origin: 50% 90%;
+    transform-box: fill-box;
+    animation: wk-mascot-breathe 3.6s ease-in-out infinite;
+}
+
+.wk-mascot-leaf {
+    transform-origin: 24px 14px;
+    animation: wk-mascot-sway 3.2s ease-in-out infinite;
+}
+
+.wk-mascot-eyes {
+    transition: transform 160ms ease-out;
+}
+
+.wk-mascot-blink {
+    transform-origin: center;
+    transform-box: fill-box;
+    animation: wk-mascot-blink 4.8s ease-in-out infinite;
+}
+
+.wk-mascot-shadow {
+    position: absolute;
+    left: 22%;
+    right: 22%;
+    bottom: -6%;
+    height: 8%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(124, 58, 237, .22), transparent);
+    animation: wk-mascot-shadow 3.6s ease-in-out infinite;
+}
+
+@keyframes wk-mascot-breathe {
+    0%, 100% { transform: translateY(0) scale(1, 1); }
+    50% { transform: translateY(-4%) scale(1.01, .99); }
+}
+
+@keyframes wk-mascot-shadow {
+    0%, 100% { transform: scaleX(1); opacity: 1; }
+    50% { transform: scaleX(.86); opacity: .7; }
+}
+
+@keyframes wk-mascot-sway {
+    0%, 100% { transform: rotate(0deg); }
+    40% { transform: rotate(-6deg); }
+    72% { transform: rotate(5deg); }
+}
+
+@keyframes wk-mascot-blink {
+    0%, 90%, 100% { transform: scaleY(1); }
+    93%, 95% { transform: scaleY(.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wk-mascot *, .wk-mascot-shadow {
+        animation: none !important;
+        transition: none !important;
+    }
+}

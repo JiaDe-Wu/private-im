@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Private IM tool</string>
+    <string name="no_permissions">授权失败,APP部分功能将无法使用，请打开应用权限后重试</string>
+    <string name="agree">同意</string>
+    <string name="disagree">不同意</string>
+    <string name="app_slogan">两行代码，即可通讯</string>
+    <string name="dialog_title">欢迎使用 Private IM tool</string>
+    <string name="dialog_content">在开始之前，请花一分钟阅读《用户协议》和《隐私政策》，了解我们如何保护你的个人信息：\n\n· 我们仅在你同意后获取手机号与设备信息，用于登录和消息推送；\n· 聊天图片与文件加密存储，仅会话成员可以访问；\n· 你可以随时查看、更正或删除个人信息；\n· 未经你的许可，我们不会向任何第三方提供你的信息。</string>
+    <string name="main_user_agreement">《用户协议》</string>
+    <string name="main_privacy_policy">《隐私政策》</string>
+</resources>

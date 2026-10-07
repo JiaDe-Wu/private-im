@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="moments_title">朋友圈</string>
+    <string name="moments_tab">朋友圈</string>
+    <string name="moments_empty">还没有动态，发一条和朋友分享此刻吧</string>
+    <string name="moments_user_empty">这里还没有动态</string>
+    <string name="moments_new_notices">%d 条新消息</string>
+    <string name="moments_like">赞</string>
+    <string name="moments_liked">已赞</string>
+    <string name="moments_comment">评论</string>
+    <string name="moments_delete">删除</string>
+    <string name="moments_delete_confirm">删除这条动态？</string>
+    <string name="moments_delete_comment_confirm">删除这条评论？</string>
+    <string name="moments_reply_to">回复 %s</string>
+    <string name="moments_comment_hint">写评论…</string>
+    <string name="moments_send">发送</string>
+    <string name="moments_publish_title">发布动态</string>
+    <string name="moments_publish">发布</string>
+    <string name="moments_publish_hint">这一刻的想法…</string>
+    <string name="moments_private_only">仅自己可见</string>
+    <string name="moments_private_desc">打开后只有你能看到这条动态</string>
+    <string name="moments_publishing">发布中…</string>
+    <string name="moments_publish_empty">写点什么或选几张图片吧</string>
+    <string name="moments_notices_title">消息</string>
+    <string name="moments_notices_empty">还没有新的互动</string>
+    <string name="moments_notice_liked">赞了你的动态</string>
+    <string name="moments_detail_title">详情</string>
+    <string name="moments_user_title">%s 的动态</string>
+    <string name="moments_my_title">我的动态</string>
+</resources>

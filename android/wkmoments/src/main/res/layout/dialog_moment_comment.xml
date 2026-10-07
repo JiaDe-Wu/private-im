@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 评论输入条（底部弹出，随键盘上移） -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/layoutColor"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/inputEt"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@drawable/ps_moment_input_bg"
+        android:hint="@string/moments_comment_hint"
+        android:imeOptions="actionSend"
+        android:inputType="text"
+        android:maxLength="500"
+        android:minHeight="38dp"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:textColor="@color/colorDark"
+        android:textColorHint="@color/color999"
+        android:textSize="15sp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/sendBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:minWidth="64dp"
+        android:text="@string/moments_send"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:backgroundTint="@color/colorAccent"
+        app:cornerRadius="20dp"
+        xmlns:app="http://schemas.android.com/apk/res-auto" />
+</LinearLayout>

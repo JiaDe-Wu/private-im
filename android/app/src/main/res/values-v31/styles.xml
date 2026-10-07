@@ -1,0 +1,27 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimaryDark">@color/welcome_bg</item>
+        <item name="android:forceDarkAllowed">false</item>
+        <item name="colorPrimary">@color/color999</item>
+        <item name="android:windowBackground">@color/transparent</item>
+<!--        <item name="android:windowIsTranslucent">true</item>-->
+<!--        <item name="android:windowAnimationStyle">@style/animation_translucent_translate</item>-->
+
+    </style>
+
+    <style name="Theme.FullscreenTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/ps_splash</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <!-- Android 12+ 系统启动画面：与 ps_splash 同底色，图标用应用图标 -->
+        <item name="android:windowSplashScreenBackground">@color/welcome_bg</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ps_splash_logo</item>
+    </style>
+
+</resources>

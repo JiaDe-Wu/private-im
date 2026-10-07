@@ -1,0 +1,110 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-parcelize'
+    id 'kotlin-android'
+}
+
+// 读取 local.properties 中的 applicationId
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localProperties.load(new FileInputStream(localPropertiesFile))
+}
+
+def appId = localProperties.getProperty('applicationId')
+if (appId == null || appId.isEmpty()) {
+    throw new GradleException("❌ 错误：请在 local.properties 中设置 applicationId=你的包名，并在MainActivity和TSApplication文件中导包设置的包名")
+}
+
+android {
+//    signingConfigs {
+//        debug {
+//            storeFile file('../demo.jks')
+//            storePassword 'demo1365'
+//            keyAlias = 'demo'
+//            keyPassword 'demo1365'
+//        }
+//        release {
+//            storeFile file('../demo.jks')
+//            storePassword 'demo1365'
+//            keyAlias = 'demo'
+//            keyPassword 'demo1365'
+//        }
+//    }
+    namespace appId
+    compileSdk rootProject.ext.compileSdkVersion
+    aaptOptions.cruncherEnabled = false
+    aaptOptions.useNewCruncher = false
+
+
+    defaultConfig {
+        applicationId appId
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "0.1.0"
+        // PitchShow 开发环境（~/tsdd/infra）：接口地址与 CloudFront 访问密码
+        buildConfigField "String", "API_BASE_URL", "\"https://dexample3.cloudfront.net/api\""
+        buildConfigField "String", "ACCESS_PASSWORD", "\"<ACCESS_PASSWORD>\""
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
+        vectorDrawables.useSupportLibrary = true
+        multiDexEnabled true
+        ndk {
+            //根据需要 自行选择添加的对应cpu类型的.so库。
+            abiFilters "armeabi-v7a", "arm64-v8a"
+//            abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86'
+        }
+
+    }
+
+    buildTypes {
+        release {
+            jniDebuggable true
+            //  zipAlignEnabled true   //Zipalign优化
+            minifyEnabled true  // 是否混淆
+            shrinkResources true  // 是否去除无效的资源文件
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+           // signingConfig signingConfigs.release
+        }
+        debug {
+//            jniDebuggable true
+//            zipAlignEnabled true   //Zipalign优化
+//            minifyEnabled true  // 是否混淆
+//            shrinkResources true  // 是否去除无效的资源文件
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+           // signingConfig signingConfigs.release
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+    buildFeatures {
+        viewBinding true
+        dataBinding true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.3.2'
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+}
+
+dependencies {
+    api project(':wkbase')
+    implementation project(path: ':wkuikit')
+    implementation project(path: ':wklogin')
+    implementation project(path: ':wkscan')
+    implementation project(path: ':wkmoments')
+    // 第一阶段不做离线推送：原 wkpush 模块（华为/小米/OPPO/vivo/FCM，含原项目的推送密钥）暂不引入
+}

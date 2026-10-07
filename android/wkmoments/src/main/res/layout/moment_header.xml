@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 时间线头部：封面 + 我的头像昵称 + 新消息提示 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="236dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/coverIv"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ps_moment_cover" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="start|top"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="34dp"
+            android:alpha="0.9"
+            android:src="@drawable/ps_mascot" />
+
+        <TextView
+            android:id="@+id/myNameTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|top"
+            android:layout_marginTop="160dp"
+            android:layout_marginEnd="96dp"
+            android:shadowColor="#66000000"
+            android:shadowRadius="6"
+            android:textColor="@color/white"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <com.chat.base.ui.components.AvatarView
+            android:id="@+id/myAvatarView"
+            android:layout_width="68dp"
+            android:layout_height="68dp"
+            android:layout_gravity="end|bottom"
+            android:layout_marginEnd="16dp" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/noticeTv"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/ps_moment_pill"
+        android:gravity="center"
+        android:paddingStart="18dp"
+        android:paddingEnd="18dp"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/emptyTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="60dp"
+        android:paddingBottom="60dp"
+        android:text="@string/moments_empty"
+        android:textColor="@color/color999"
+        android:textSize="14sp"
+        android:visibility="gone" />
+</LinearLayout>

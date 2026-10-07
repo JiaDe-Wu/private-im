@@ -1,0 +1,21 @@
+// PitchShow 朋友圈模块：时间线、发布、点赞评论、互动消息（服务端 modules/moment，接口 /v1/moments）
+apply plugin: 'com.android.library'
+android {
+    compileSdk rootProject.ext.compileSdkVersion
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    buildFeatures {
+        viewBinding true
+    }
+    namespace 'com.chat.moments'
+}
+dependencies {
+    api project(':wkbase')
+}
