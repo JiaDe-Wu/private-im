@@ -13,7 +13,11 @@ type MascotProps = {
     className?: string
 }
 
+let mascotSeq = 0
+
 export default class Mascot extends Component<MascotProps> {
+    // 每个实例独立的渐变 ID：页面上有多个桃子时，避免同名 ID 引用到被隐藏的那份
+    private readonly gradientId = `wk-mascot-body-${++mascotSeq}`
     private svgRef = createRef<SVGSVGElement>()
     private eyesRef = createRef<SVGGElement>()
     private frame = 0
@@ -56,14 +60,15 @@ export default class Mascot extends Component<MascotProps> {
         return <div className={`wk-mascot ${className ?? ""}`} style={{ width: size, height: size }}>
             <svg ref={this.svgRef} viewBox="0 0 48 48" width={size} height={size} fill="none" aria-hidden="true">
                 <defs>
-                    <radialGradient id="wk-mascot-body" cx="40%" cy="28%" r="64%">
+                    <radialGradient id={this.gradientId} cx="40%" cy="28%" r="64%">
                         <stop offset="0%" stopColor="#FFCDB0" />
                         <stop offset="55%" stopColor="#FFAB91" />
                         <stop offset="100%" stopColor="#FF8B70" />
                     </radialGradient>
                 </defs>
                 <g className="wk-mascot-body">
-                    <path d={BODY} fill="url(#wk-mascot-body)" stroke="rgba(0,0,0,0.07)" strokeWidth="1.2" />
+                    {/* 渐变解析失败时退回纯桃色（SVG paint 兜底语法），无论如何不会透明 */}
+                    <path d={BODY} fill={`url(#${this.gradientId}) #FFAB91`} stroke="rgba(0,0,0,0.07)" strokeWidth="1.2" />
                     <ellipse className="wk-mascot-leaf" cx="27.5" cy="9.5" rx="4.8" ry="7.2" fill="#4CAF50" transform="rotate(20 27.5 9.5)" />
                     <path d="M24,14 C24.5,11.5 26,10 27.5,8.5" stroke="#3a7020" strokeWidth="1.3" fill="none" strokeLinecap="round" />
                     <ellipse cx="10" cy="33.5" rx="5.5" ry="3.2" fill="rgba(255,120,90,0.22)" />

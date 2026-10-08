@@ -186,8 +186,10 @@ class Login extends Component {
         const isTabView = vm.view === AuthView.login || vm.view === AuthView.register
         const subTitle = vm.view === AuthView.forget ? "找回密码" : "扫码登录"
         // 抖动动画在 shake-0 / shake-1 两个同款 keyframes 间交替，每次出错都能重新触发且不重建 DOM
-        return <section className={classNames("wk-login-card", vm.errorTick > 0 && `shake-${vm.errorTick % 2}`, vm.success && "success")}>
+        // 桃子放在不做变换的外层：卡片有跟随鼠标的 3D 倾斜，Safari 会在 3D 图层重绘时丢掉 SVG 渐变填充，桃子变透明
+        return <div className={classNames("wk-login-card-wrap", vm.success && "success")}>
             <Mascot size={84} className="wk-login-card-mascot" />
+            <section className={classNames("wk-login-card", vm.errorTick > 0 && `shake-${vm.errorTick % 2}`, vm.success && "success")}>
             <div className="wk-login-card-inner">
                 {isTabView ? <div className={classNames("wk-login-tabs", vm.view === AuthView.register && "right")} role="tablist">
                     <span className="wk-login-tabs-indicator" />
@@ -209,7 +211,8 @@ class Login extends Component {
                     <i key={i} style={{ "--a": `${(360 / CONFETTI_COUNT) * i}deg`, "--d": `${110 + (i % 4) * 28}px`, "--c": i % 3 === 0 ? "#FF9A80" : i % 3 === 1 ? "#7c3aed" : "#a78bfa" } as React.CSSProperties} />
                 ))}
             </div> : undefined}
-        </section>
+            </section>
+        </div>
     }
 
     render() {

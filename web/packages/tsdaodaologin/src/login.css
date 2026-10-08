@@ -231,11 +231,17 @@
 
 /* ---------------- 卡片 ---------------- */
 
-.wk-login-card {
+/* 卡片外层：不做任何变换，承载桃子 */
+.wk-login-card-wrap {
     position: relative;
     flex: 0 0 400px;
     width: 400px;
     margin-top: 40px;
+}
+
+.wk-login-card {
+    position: relative;
+    width: 100%;
     transform: perspective(1400px) rotateX(calc((var(--my) - .5) * -3deg)) rotateY(calc((var(--mx) - .5) * 4deg));
     transition: transform 400ms ease-out;
     animation: wk-login-card-in 900ms var(--spring) 350ms both;
@@ -269,6 +275,12 @@
     z-index: 3;
     top: -46px;
     left: calc(50% - 42px);
+    /* 与卡片同步入场（只用 2D 的 translate / scale） */
+    animation: wk-login-card-in 900ms var(--spring) 350ms both;
+}
+
+.wk-login-card-wrap.success .wk-login-card-mascot {
+    animation: wk-login-card-out 520ms var(--spring) both;
 }
 
 .wk-login-card.shake-0 { animation: wk-login-shake-0 520ms ease both; }
@@ -946,9 +958,12 @@
         padding: 48px 16px 32px;
     }
 
-    .wk-login-card {
+    .wk-login-card-wrap {
         flex-basis: auto;
         width: 100%;
+    }
+
+    .wk-login-card {
         transform: none;
     }
 
