@@ -49,7 +49,7 @@
 
 | 项目 | 地址 / 说明 |
 |---|---|
-| 仓库 | https://github.com/JiaDe-Wu/private-im（私有，分支 `main`） |
+| 仓库 | https://github.com/JiaDe-Wu/private-im（公开，分支 `main`） |
 | 网页 | `infra/cdk-outputs.json` → `PitchShowDevWeb.WebUrl` |
 | 安装包 | `<网页地址>/download/private-im-dev.apk` |
 | 演示账号 | `13900000001`～`13900000005`，密码 `test123456` |
