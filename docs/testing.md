@@ -3,7 +3,7 @@
 | 层级 | 工具 | 位置 | 覆盖内容 |
 |---|---|---|---|
 | 接口 | Python | `devenv/seed/test_moments.py` | 朋友圈 44 项：发布、时间线、可见性、共同好友规则、点赞评论、提醒、删除好友后的清理 |
-| Web 端到端 | Playwright（Chromium） | `tools/e2e-cloud.js` | 访问密码 → 登录 → WSS 长连接 → 两个账号实时收发 → 发图（S3 上传与签名 URL）→ 朋友圈图片加载；同时检查页面报错和 4xx/5xx |
+| Web 端到端 | Playwright（Chromium） | `tools/e2e-cloud.js` | 登录（若开启访问密码会自动带上） → WSS 长连接 → 两个账号实时收发 → 发图（S3 上传与签名 URL）→ 朋友圈图片加载；同时检查页面报错和 4xx/5xx |
 | Web 页面巡检 | Playwright | `tools/web-audit.js` | 主要页面截图（登录、首页、群聊、看图、单聊、朋友圈、通讯录）与首屏 / 登录到首页 / 打开群聊耗时；`VIDEO=1` 同时录屏 |
 | Android 真机 | Appium 3 + AWS Device Farm | `tools/devicefarm/` | 启动 → 协议弹窗 → 登录 → 聊天实时收发（TCP 长连接）→ 页面巡检 → 朋友圈（点赞、评论、发布、实时提醒、互动消息、详情）→ 带图发布 |
 

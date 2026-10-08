@@ -12,7 +12,7 @@
 | 日志里的手机号和验证码 | `server/modules/base/common/service_sms.go`：第 93 行记录发送的验证码、第 174 行记录错误验证码和手机号（上游原有）；**第 60 行是我们为开发环境「固定验证码时跳过发短信」新增的，会记录区号和手机号** |
 | CORS 配置 | 未改动 |
 | 文件预览鉴权 | 未改动：`/v1/file/preview/...` 跳转到 S3 签名链接，预览接口本身不校验登录 |
-| 仓库里的明文密钥 | 仍在：开发环境访问密码（`infra/functions/*.js`、`android/app/build.gradle`、`tools/*.js`）、开发数据库密码（`devenv/`）、开发环境固定短信验证码（`devenv/server.env` 的 `TS_SMSCODE`）。**已处理过的部分**：上游遗留的厂商推送密钥已清空（`android/wkpush`） |
+| 仓库里的明文密钥 | 仍在：开发环境访问密码（`infra/functions/*.js`、`android/app/build.gradle`、`tools/*.js`；CloudFront 上默认已不启用）、开发数据库密码（`devenv/`）、开发环境固定短信验证码（`devenv/server.env` 的 `TS_SMSCODE`）。**已处理过的部分**：上游遗留的厂商推送密钥已清空（`android/wkpush`） |
 
 ### 合规
 
@@ -43,7 +43,7 @@
 | Android 网络客户端去掉「信任任意证书」，改为系统默认校验；WebView 证书错误改为拒绝 | `android/wkbase/.../net/OkHttpUtils.java`、`glide/UnsafeOkHttpClient.java`、`jsbrigde/BridgeWebViewClient.java` |
 | Android 访问密码拦截器（只对接口域名附加 Basic Auth） | `android/wkbase/.../net/AccessAuthInterceptor.java` |
 | Android 离线推送模块 `wkpush` 未引入构建 | `android/settings.gradle` |
-| 开发环境 CloudFront 访问密码，新增 `-c publicAccess=true` 开关 | `infra/lib/dev-web-stack.ts`，见 [部署文档](deployment.md) 第 4 节 |
+| 开发环境 CloudFront 访问密码改为可开关，**默认公开访问**（`infra/cdk.json` 的 `publicAccess`） | `infra/lib/dev-web-stack.ts`，见 [部署文档](deployment.md) 第 4 节 |
 
 ## 3. 环境
 

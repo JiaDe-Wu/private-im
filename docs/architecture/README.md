@@ -93,14 +93,14 @@ Private IM tool 是一款私密、轻快的即时通讯产品，支持 Web 和 A
 | ElastiCache | Valkey 8.2，`cache.t4g.micro`，单节点 | 静态加密，每日快照；只允许 EC2 访问 | ≈ $15.8 |
 | S3 · 网页 | 私有桶 | 只允许 CloudFront 通过 OAC 读取 | ≈ $0 |
 | S3 · 用户文件 | 私有桶，版本控制（旧版本保留 30 天） | 实例角色凭证访问；签名 URL 下载 | 按量 |
-| CloudFront | 网页分发、WebSocket 分发 | 网页和 `/api` 有访问密码；`/api/*` 去掉前缀后回源业务服务 | ≈ $1 |
+| CloudFront | 网页分发、WebSocket 分发 | 默认公开访问（可开启访问密码）；`/api/*` 去掉前缀后回源业务服务 | ≈ $1 |
 | 安全组 | `pitchshow-dev-origin`、`pitchshow-dev-cache` | 回源端口只放行 CloudFront；缓存只放行 EC2 | 免费 |
 
 接入方式：
 
 | 入口 | 地址 | 说明 |
 |---|---|---|
-| 网页与接口 | `https://<网页分发>/`、`/api/v1/` | 访问密码保护（开发环境） |
+| 网页与接口 | `https://<网页分发>/`、`/api/v1/` | 默认公开访问，可开启访问密码（见部署文档） |
 | Web 长连接 | `wss://<WebSocket 分发>` | 浏览器跨域不会带上 Basic Auth，所以不设访问密码；连接本身需要 IM 令牌 |
 | App 长连接 | `TCP <EC2 公网 IP>:18100` | App 的 SDK 只支持 TCP，CloudFront 无法代理 TCP，只能直连 |
 | App 安装包 | `https://<网页分发>/download/private-im-dev.apk` | 调试包 |
@@ -118,7 +118,7 @@ Private IM tool 是一款私密、轻快的即时通讯产品，支持 Web 和 A
 | 凭证 | 服务端用 EC2 实例角色访问 S3，代码和配置里没有任何 AWS 密钥 |
 | 网络 | 回源端口只对 CloudFront 前缀列表开放；缓存只允许 EC2 安全组访问 |
 | 权限 | CDK 部署角色只有 PowerUser 加上本项目前缀的 IAM 权限，不是 Administrator |
-| 开发环境 | 整站加访问密码，防止测试账号外泄后被人随意登录 |
+| 开发环境 | 可开启整站访问密码（默认关闭，便于演示） |
 
 **已知事项（上线前需要处理）**
 

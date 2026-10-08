@@ -8,7 +8,7 @@
 |---|---|---|
 | `PitchShowCDKToolkit` | CDK 初始化资源（qualifier `pitchshow`）。部署角色的权限是 PowerUser 加上 `pitchshow-cfn-exec-iam`（只能管理本项目前缀的 IAM 角色和策略） | ≈ $0 |
 | `PitchShowDevCache` | ElastiCache Valkey 8.2 `cache.t4g.micro` 单节点；安全组 `pitchshow-dev-cache`（6379 只放行 EC2 实例安全组） | ≈ $15.8 |
-| `PitchShowDevWeb` | 网页 S3 桶 + CloudFront（OAC）；`/api/*` 回源 EC2:18090；WebSocket 分发回源 EC2:18091；访问密码函数；安全组 `pitchshow-dev-origin`（18090–18091 只放行 CloudFront，18100 供 App 直连） | ≈ $1 |
+| `PitchShowDevWeb` | 网页 S3 桶 + CloudFront（OAC）；`/api/*` 回源 EC2:18090；WebSocket 分发回源 EC2:18091；访问密码函数（默认不启用）；安全组 `pitchshow-dev-origin`（18090–18091 只放行 CloudFront，18100 供 App 直连） | ≈ $1 |
 
 固定参数（VPC、子网、实例、端口）在 `infra/lib/config.ts`。部署输出写在 `infra/cdk-outputs.json`。
 
@@ -43,19 +43,19 @@ scripts/migrate-redis.sh <ElastiCache 地址:6379> # 可选：把本地 Redis �
 | 业务服务 | 在 EC2 上重启 `devenv/run-server.sh`（见 [开发指南](development.md)） |
 | 基础设施 | `cd infra && npx cdk diff && npx cdk deploy <栈名> --outputs-file cdk-outputs.json` |
 
-## 4. 演示当天：关闭访问密码
+## 4. 访问密码（默认关闭）
 
-开发环境默认整站有访问密码，浏览器会先弹出认证框。演示时如果希望观众扫码后直接看到 App 自己的登录页，可以临时关闭：
+开发环境现在默认**公开访问**（`infra/cdk.json` 的 `context.publicAccess = true`），打开网址直接进入 App 自己的登录页。需要临时加回 CloudFront 访问密码时：
 
 ```bash
 cd infra
-npx cdk deploy PitchShowDevWeb -c publicAccess=true --outputs-file cdk-outputs.json   # 关闭（输出 AccessMode = public）
-npx cdk deploy PitchShowDevWeb --outputs-file cdk-outputs.json                         # 演示结束后恢复（AccessMode = password）
+npx cdk deploy PitchShowDevWeb -c publicAccess=false --outputs-file cdk-outputs.json   # 开启访问密码（AccessMode = password）
+npx cdk deploy PitchShowDevWeb --outputs-file cdk-outputs.json                          # 恢复默认的公开访问（AccessMode = public）
 ```
 
-- 生效时间：CloudFront 一般在 1～3 分钟内全球生效。
-- 关闭期间网页、接口、安装包下载都可以被任何人访问；演示账号和开发环境的固定验证码也同样暴露，**演示结束后务必恢复**。
-- Android 安装包内置了访问密码，关闭期间同样可以正常使用（多出的 `Authorization` 头会被忽略），不需要重新打包。
+- CloudFront 一般在 1～3 分钟内全球生效。
+- 公开访问时，任何拿到网址的人都能打开环境；演示账号密码和开发环境的固定验证码（`TS_SMSCODE`）也是公开的，别人可以注册新账号，或用「忘记密码」改掉演示账号的密码。演示数据被改动后，用 `devenv/seed/` 的脚本重新生成。
+- Android 安装包内置了访问密码，两种模式下都能正常使用（公开模式下多出的 `Authorization` 头会被忽略）。
 
 ## 5. 回滚
 
@@ -70,5 +70,5 @@ npx cdk deploy PitchShowDevWeb --outputs-file cdk-outputs.json                  
 
 - **不要给 CloudFront 分发配置 `errorResponses`**。它对整个分发生效，会把 `/api` 的 404 替换成 `index.html`（状态码 200），导致前端解析出错。Web 端不使用路径路由，不需要这项回退。
 - CloudFront 前缀列表在安全组里按 55 条规则计算，单个安全组最多 60 条。所以回源端口放在单独的安全组里，并且用一条规则覆盖连续的端口范围。
-- 访问密码写在 `infra/functions/*.js`，修改后需要重新部署 `PitchShowDevWeb`。
+- 访问密码写在 `infra/functions/*.js`（默认不启用），修改后需要重新部署 `PitchShowDevWeb`。
 - 同一个 AWS 账号里还有其他项目的 CDK 资源（不同 qualifier），本项目的资源统一使用 `pitchshow` / `PitchShow` 前缀。

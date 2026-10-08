@@ -99,7 +99,7 @@ ANDROID_HOME=~/.local/android-sdk ./gradlew assembleDebug
 
 | 现象 | 处理 |
 |---|---|
-| 网页弹出访问密码框 | 开发环境整站有访问密码，用户名随意，密码在 `infra/functions/*.js` 中配置 |
+| 网页弹出访问密码框 | 说明访问密码被开启了（默认关闭），见 [部署文档](deployment.md) 第 4 节 |
 | 图片 403 | 签名 URL 后面不能再追加参数；头像跳转地址要用 `file.WithVersion` 生成 |
 | `/api` 返回了 HTML | CloudFront 分发不能配置 `errorResponses`，否则 `/api` 的 404 会被替换成 `index.html` |
 | App 连不上长连接 | 检查 `WK_EXTERNAL_TCPADDR` 是否为当前 EC2 公网 IP，以及安全组是否放行 18100 |

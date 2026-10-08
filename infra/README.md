@@ -11,7 +11,7 @@
 
 ## 地址
 
-- 网页：https://dexample3.cloudfront.net（访问密码：用户名任意，密码见 `functions/*.js`）
+- 网页：https://dexample3.cloudfront.net（默认公开访问；访问密码开关见 [部署文档](../docs/deployment.md) 第 4 节）
 - WebSocket：wss://dexample1.cloudfront.net（不加访问密码：浏览器跨域不会带 Basic Auth，连接本身需要登录令牌）
 - 全部输出见 `cdk-outputs.json`
 
@@ -28,7 +28,7 @@ node ~/tsdd/tools/e2e-cloud.js        # 云上端到端测试
 
 ## 注意
 
-- **访问密码**写在 `functions/*.js` 里，改密码后重新部署 `PitchShowDevWeb`。
+- **访问密码**写在 `functions/*.js` 里，默认不启用（`cdk.json` 的 `publicAccess`）；修改后重新部署 `PitchShowDevWeb`。
 - **不要给分发加 `errorResponses`**：它对整个分发生效，会把 `/api` 的 404 替换成 `index.html`（200），前端会解析出错。
 - CloudFront 前缀列表在安全组里按 55 条规则计算，实例原有安全组已无余量，所以回源端口放在单独的安全组里，并且用一条规则覆盖连续端口 18090–18091。
 - 回源走 HTTP（与线上一致），后续迁到 Lambda / API Gateway 时自然解决。

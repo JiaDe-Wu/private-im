@@ -39,7 +39,7 @@ export class DevWebStack extends cdk.Stack {
       }],
     });
 
-    // 访问密码开关：默认开启；演示当天可用 `npx cdk deploy PitchShowDevWeb -c publicAccess=true` 临时关闭
+    // 访问密码开关：cdk.json 默认 publicAccess=true（公开访问）；需要恢复访问密码时 `npx cdk deploy PitchShowDevWeb -c publicAccess=false`
     const publicAccess = this.node.tryGetContext('publicAccess') === 'true' || this.node.tryGetContext('publicAccess') === true;
 
     const fnCode = (name: string) => cloudfront.FunctionCode.fromInline(
@@ -107,7 +107,7 @@ export class DevWebStack extends cdk.Stack {
       },
     });
 
-    new cdk.CfnOutput(this, 'AccessMode', { value: publicAccess ? 'public' : 'password', description: '访问密码开关（-c publicAccess=true 关闭）' });
+    new cdk.CfnOutput(this, 'AccessMode', { value: publicAccess ? 'public' : 'password', description: '访问密码开关（cdk.json 的 publicAccess；-c publicAccess=false 开启密码）' });
     new cdk.CfnOutput(this, 'WebUrl', { value: `https://${web.distributionDomainName}` });
     new cdk.CfnOutput(this, 'WebDistributionId', { value: web.distributionId });
     new cdk.CfnOutput(this, 'WssAddr', { value: `wss://${ws.distributionDomainName}`, description: '填入 WuKongIM 的 WK_EXTERNAL_WSSADDR' });
